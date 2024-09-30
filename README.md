@@ -87,9 +87,62 @@ kubectl exec -it mongo-0 -- mongo --eval "rs.initiate()"
 
 ### Running MongoDB Cluster
 
+#### 1. Using Docker (For Local Testing)
+To spin up a MongoDB container locally using Docker:
+
+```
+docker-compose up -d
+```
+
+This command will start a MongoDB instance running on port 27017. You can change configuration settings in the docker-compose.yml file.
+
+#### 2. Using Kubernetes (For Scalable Testing)
+Deploy MongoDB as a StatefulSet in Kubernetes:
+
+```
+kubectl apply -f k8s/mongo-statefulset.yaml
+```
+
+This will deploy a MongoDB replica set in a Kubernetes cluster, with persistent storage for each pod.
+
+#### 3. Expose MongoDB Service
+```
+kubectl apply -f k8s/mongo-service.yaml
+```
+
+This creates a service to expose the MongoDB cluster so you can connect to it externally.
+
 ### Automated Testing
 
+#### 1. Unit Testing
+
+Unit tests are used to validate MongoDB operations (e.g., CRUD operations, connections, etc.). You can run the unit tests to validate MongoDB interactions:
+
+```
+python -m unittest discover -s tests/
+```
+
+Example unit tests include:
+* Connection tests.
+* Insert, find, update, and delete operations.
+* Replica set configuration testing.
+
+#### 2. Fuzz Testing
+
+Fuzz testing randomly inputs malformed data into MongoDB operations to identify crashes and vulnerabilities. We integrate ClusterFuzz or OSS-Fuzz to automate this process.
+
+Running Fuzz Tests Locally with ClusterFuzz:
+a. Install ClusterFuzz on your local machine or set it up in the cloud.
+b. Compile your MongoDB client with libFuzzer.
+c. Run the fuzzing tests using ClusterFuzz:
+
+```
+clusterfuzz run_fuzzer mongo_fuzzer --iterations=1000
+```
+
 ### CI/CD with GitHub Actions
+
+The project integrates with GitHub Actions to automate testing after each commit.
 
 ## Bug tracking
 
