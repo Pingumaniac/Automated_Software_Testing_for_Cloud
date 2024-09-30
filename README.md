@@ -132,10 +132,9 @@ Example unit tests include:
 Fuzz testing randomly inputs malformed data into MongoDB operations to identify crashes and vulnerabilities. We integrate ClusterFuzz or OSS-Fuzz to automate this process.
 
 Running Fuzz Tests Locally with ClusterFuzz:
-
-a. Install ClusterFuzz on your local machine or set it up in the cloud.
-b. Compile your MongoDB client with libFuzzer.
-c. Run the fuzzing tests using ClusterFuzz:
+* Install ClusterFuzz on your local machine or set it up in the cloud.
+* Compile your MongoDB client with libFuzzer.
+* Run the fuzzing tests using ClusterFuzz:
 
 ```
 clusterfuzz run_fuzzer mongo_fuzzer --iterations=1000
