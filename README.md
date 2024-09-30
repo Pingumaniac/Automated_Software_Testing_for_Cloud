@@ -47,5 +47,5 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 2. Kubernetes (minikube or kubeadm): For orchestrating MongoDB clusters.
 3. Python 3.12.6: For running benchmark and test scripts.
 4. MongoDB CLI Tools: To interact with MongoDB from the command line.
-5.. OpenStack CLI (optional): If you plan to use Chameleon Cloud for provisioning resources.
+5. OpenStack CLI (optional): If you plan to use Chameleon Cloud for provisioning resources.
 6. ClusterFuzz/OSS-Fuzz (optional): For fuzz testing.
