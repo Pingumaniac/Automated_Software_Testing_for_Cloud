@@ -129,15 +129,17 @@ Example unit tests include:
 
 #### 2. Fuzz Testing
 
-Fuzz testing randomly inputs malformed data into MongoDB operations to identify crashes and vulnerabilities. We integrate ClusterFuzz or OSS-Fuzz to automate this process.
+Fuzz testing randomly inputs malformed data into MongoDB operations to identify crashes and vulnerabilities. We integrate simple fuzz test and AFL to automate this process.
 
-Running Fuzz Tests Locally with ClusterFuzz:
-* Install ClusterFuzz on your local machine or set it up in the cloud.
-* Compile your MongoDB client with libFuzzer.
-* Run the fuzzing tests using ClusterFuzz:
-
+Install python-afl on your local machine or set it up in the cloud.
 ```
-clusterfuzz run_fuzzer mongo_fuzzer --iterations=1000
+pip3 install python-afl
+```
+
+Then, you can execute the following commands to run the fuzz tests:
+```
+python3 tests/test_simple_fuzz.py
+python3 tests/test_afl.py
 ```
 
 ### CI/CD with GitHub Actions
