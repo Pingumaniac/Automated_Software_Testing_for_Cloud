@@ -1,6 +1,6 @@
 # Automated_Software_Testing_for_Cloud
 
-This project automates the deployment, configuration, and evaluation of MongoDB clusters using Docker and Kubernetes, with built-in support for unit testing and fuzz testing. The goal is to provide a framework for testing MongoDB performance, scalability, and reliability in various environments, including Chameleon Cloud. The project also integrates with GitHub Actions for continuous integration (CI) and testing.
+This project automates the deployment, configuration, and evaluation of MongoDB clusters using Docker and Kubernetes, with built-in support for unit testing and fuzz testing. The goal is to provide a framework for testing MongoDB performance, scalability, and reliability in various environments, including Chameleon Cloud.
 
 ## About Members
 
@@ -141,10 +141,6 @@ Then, you can execute the following commands to run the fuzz tests:
 python3 tests/test_simple_fuzz.py
 python3 tests/test_afl.py
 ```
-
-### CI/CD with GitHub Actions
-
-The project integrates with GitHub Actions to automate testing after each commit.
 
 ## Bug tracking
 
