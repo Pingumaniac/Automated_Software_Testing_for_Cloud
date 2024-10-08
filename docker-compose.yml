@@ -16,7 +16,7 @@ services:
       - mongo-network
 
   app:
-    build: ./ci/docker  # Dockerfile should be in ./ci/docker
+    build: ./app  # Dockerfile should be in ./app
     container_name: mongo-app
     restart: always
     depends_on:
