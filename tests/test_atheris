@@ -1,0 +1,125 @@
+import atheris  # Atheris for Python fuzzing
+import pymongo
+import sys
+import random
+import string
+import json
+from pymongo.errors import ConnectionFailure
+
+
+class AtherisFuzzer:
+    def __init__(self, uri="mongodb://localhost:27017", database_name="testdb", collection_name="fuzzdata"):
+        self.uri = uri
+        self.database_name = database_name
+        self.collection_name = collection_name
+        self.client = None
+        self.db = None
+        self.collection = None
+
+    def connect(self):
+        """
+        Connect to the MongoDB server and the specified database and collection.
+        """
+        try:
+            self.client = pymongo.MongoClient(self.uri)
+            self.db = self.client[self.database_name]
+            self.collection = self.db[self.collection_name]
+            # Test connection
+            self.client.admin.command('ping')
+            print(f"Connected to MongoDB at {self.uri}")
+        except ConnectionFailure as e:
+            print(f"Failed to connect to MongoDB: {e}")
+            raise
+
+    def fuzz_insert(self, fuzzer_data):
+        """
+        Perform an insert operation with fuzzed data.
+        """
+        try:
+            document = json.loads(fuzzer_data)
+            self.collection.insert_one(document)
+        except Exception as e:
+            print(f"Error during insert operation: {e}")
+
+    def fuzz_update(self, fuzzer_data):
+        """
+        Perform an update operation with fuzzed data.
+        """
+        try:
+            document = json.loads(fuzzer_data)
+            query = {"name": document.get("name", "unknown")}
+            update = {"$set": document}
+            self.collection.update_one(query, update)
+        except Exception as e:
+            print(f"Error during update operation: {e}")
+
+    def fuzz_delete(self, fuzzer_data):
+        """
+        Perform a delete operation with fuzzed data.
+        """
+        try:
+            document = json.loads(fuzzer_data)
+            query = {"name": document.get("name", "unknown")}
+            self.collection.delete_one(query)
+        except Exception as e:
+            print(f"Error during delete operation: {e}")
+
+    def fuzz_query(self, fuzzer_data):
+        """
+        Perform a query operation with fuzzed data.
+        """
+        try:
+            query = json.loads(fuzzer_data)
+            result = self.collection.find(query)
+            list(result)  # Ensure we iterate over the results to trigger query
+        except Exception as e:
+            print(f"Error during query operation: {e}")
+
+    def close(self):
+        """
+        Close the MongoDB connection.
+        """
+        if self.client:
+            self.client.close()
+            print("MongoDB connection closed.")
+
+
+def fuzz_operations(fuzzer, data):
+    """
+    Perform random MongoDB operations for fuzz testing.
+    """
+    operation = random.choice(["insert", "update", "delete", "query"])
+    if operation == "insert":
+        fuzzer.fuzz_insert(data)
+    elif operation == "update":
+        fuzzer.fuzz_update(data)
+    elif operation == "delete":
+        fuzzer.fuzz_delete(data)
+    elif operation == "query":
+        fuzzer.fuzz_query(data)
+
+
+def TestOneInput(data):
+    """
+    Fuzzing entry point for Atheris. This function will be called with fuzzed inputs.
+    """
+    fuzzer = AtherisFuzzer()
+    try:
+        fuzzer.connect()
+        fuzz_operations(fuzzer, data)
+    except Exception as e:
+        print(f"Error in fuzzing loop: {e}")
+    finally:
+        fuzzer.close()
+
+
+def main():
+    """
+    Main entry point for the fuzzing test with Atheris.
+    """
+    atheris.Setup(sys.argv, TestOneInput)
+    atheris.Fuzz()
+
+
+if __name__ == "__main__":
+    main()
