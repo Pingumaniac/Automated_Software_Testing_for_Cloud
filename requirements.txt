@@ -5,8 +5,7 @@ pytest==8.3.3
 # MongoMock for mocking MongoDB operations in unit tests
 mongomock==4.2.0.post1
 # Fuzz testing integration
-clusterfuzz==2.6.0
-atheris==2.3.0
+python-afl==0.7.3
 # FastAPI for building high-performance APIs
 fastapi==0.115.0
 # Uvicorn is an ASGI server for serving FastAPI apps
