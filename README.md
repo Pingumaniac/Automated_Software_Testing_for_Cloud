@@ -28,7 +28,7 @@ This project automates the deployment, configuration, and evaluation of MongoDB 
 This project aims to simplify the deployment and evaluation of MongoDB by:
 * Automating the setup of MongoDB clusters using Docker and Kubernetes.
 * Providing a suite of unit tests to validate basic functionality of MongoDB interactions.
-* Integrating fuzz testing using tools like ClusterFuzz and OSS-Fuzz to identify potential vulnerabilities.
+* Integrating fuzz testing using American Fuzzy Lop (AFL) to identify potential vulnerabilities.
 * Supporting CI/CD pipelines to ensure continuous testing and reliability.
 
 ## Features

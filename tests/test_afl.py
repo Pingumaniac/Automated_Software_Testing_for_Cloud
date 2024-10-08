@@ -2,7 +2,7 @@ import random
 import string
 import pymongo
 import sys
-import afl  # AFL++ instrumentation library
+import afl  # AFL instrumentation library
 from pymongo.errors import ConnectionFailure
 
 class AFLFuzzer:
