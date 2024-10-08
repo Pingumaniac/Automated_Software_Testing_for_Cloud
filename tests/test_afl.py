@@ -121,10 +121,10 @@ if __name__ == "__main__":
     fuzzer = AFLFuzzer()
     fuzzer.connect()
 
-    afl.init()  # AFL++ instrumentation
+    afl.init()  # AFL instrumentation
 
-    # Fuzz until AFL++ terminates
-    while afl.loop(1000):  # AFL++ loop to keep fuzzing for a set number of iterations
+    # Fuzz until AFL terminates
+    while afl.loop(1000):  # AFL loop to keep fuzzing for a set number of iterations
         fuzz_operations(fuzzer)
 
     fuzzer.close()
