@@ -35,7 +35,6 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 * FastAPI for MongoDB Interaction: A high-performance API built with FastAPI to interact with MongoDB.
 * Unit Testing: Validate core MongoDB operations such as CRUD operations and replica set configurations.
 * Fuzz Testing: Stress-test the MongoDB client or server with random or invalid inputs to identify crashes and vulnerabilities.
-* CI/CD Integration: Automated testing with unit tests and fuzz testing in a continuous integration pipeline.
 * Kubernetes StatefulSet: Deploy and manage MongoDB clusters on Kubernetes with persistent storage and replica sets.
 
 ## Tools and Technologies
