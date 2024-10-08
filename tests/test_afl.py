@@ -1,7 +1,6 @@
 import random
 import string
 import pymongo
-import sys
 import afl  # AFL instrumentation library
 from pymongo.errors import ConnectionFailure
 
@@ -118,8 +117,8 @@ def fuzz_operations(fuzzer):
         fuzzer.fuzz_query()
 
 if __name__ == "__main__":
-    # AFL++ starts fuzzing from here
-    fuzzer = MongoFuzzer()
+    # AFL starts fuzzing from here
+    fuzzer = AFLFuzzer()
     fuzzer.connect()
 
     afl.init()  # AFL++ instrumentation
