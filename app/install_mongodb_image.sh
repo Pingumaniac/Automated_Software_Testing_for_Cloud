@@ -5,5 +5,5 @@ echo "Retrieving MongoDB docker container"
 docker run --name $CONTAINER_NAME -d $MONGODB_VERSION
 
 # wait for container to start
-sleep 1;
+sleep 1
 docker exec -it $CONTAINER_NAME mongosh
