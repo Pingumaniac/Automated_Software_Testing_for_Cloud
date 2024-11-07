@@ -1,4 +1,10 @@
-g
+# Automated_Software_Testing_for_Cloud
+
+This project automates the deployment, configuration, and evaluation of
+MongoDB clusters using Docker and Kubernetes, with built-in support for
+unit testing and fuzz testing. The goal is to provide a framework for
+testing MongoDB performance, scalability, and reliability in various
+environments, including Chameleon Cloud.
 
 ## About Members
 
@@ -148,32 +154,38 @@ sudo bash install_mongodb.sh
 
 ### 3. Set up Kubernetes
 
-a. Set up K8 with `vm1` as master and `vm2`, `vm3`, `vm4` as workers
-b. Install Local Path Provisioner
+#### a. Set up K8 with `vm1` as master and `vm2`, `vm3`, `vm4` as workers
+
+#### b. Install Local Path Provisioner
     ```
     kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.30/deploy/local-path-storage.yaml
     ```
-c. Create service to connect Mongo nodes
+
+#### c. Create service to connect Mongo nodes
     ```
     kubectl apply -f mongo-service.yaml
     ```
-d. Check service creation with
+#### d. Check service creation with
     ```
     kubectl get service
     ```
-e. Create 3 Mongo containers on the 3 worker VMs with Statefulset
+
+#### e. Create 3 Mongo containers on the 3 worker VMs with Statefulset
     ```
     kubectl apply -f mongo-statefulset.yaml
     ```
-f. Check pod creation with
+
+#### f. Check pod creation with
     ```
     kubectl get pods
     ```
-g. Enter into MongoDB instance
+
+#### g. Enter into MongoDB instance
     ```
     kubectl exec -it mongo-0 -- mongo
     ```
-h. Create 3 replica sets
+
+#### h. Create 3 replica sets
     ```
     rs.initiate({
         "_id" : "rs0",
@@ -193,7 +205,8 @@ h. Create 3 replica sets
         ]
     })
     ```
-i. Ensure replica sets are initialized by running this command in the mongo shell on all VMs
+
+#### i. Ensure replica sets are initialized by running this command in the mongo shell on all VMs
     ```
     kubectl exec -it mongo-[0|1|2] -- mongo
 
