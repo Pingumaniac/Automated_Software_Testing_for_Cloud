@@ -216,64 +216,97 @@ kubectl exec -it mongo-[0|1|2] -- mongo
 rs.status()
 ```
 
-## How to test this software
+## How to Test this Software
 
-### Running MongoDB Cluster
+### Steps for Full Setup
 
-#### 1. Using Docker (For Local Testing)
-To spin up a MongoDB container locally using Docker:
+#### Step 1: VM1 – Initial Configuration and Orchestration
 
+**Environment Setup with Ansible**:
+
+Use Ansible on VM1 to install Docker on VM2 and Kubernetes on VM3. This configuration enables MongoDB clusters and configurations across Docker and Kubernetes environments.
+
+Example Ansible command to install Docker and Kubernetes:
+```
+ansible-playbook -i Inventory playbook_install_docker.yml
+ansible-playbook -i Inventory playbook_install_kubernetes.yml
+```
+
+Manage Kubernetes configuration on VM3 and Docker container setups on VM2 directly through Ansible.
+
+**Control API and Testing**:
+
+Set up a FastAPI server and testing scripts (unit and fuzz tests) on VM4 to access both MongoDB instances (from Docker and Kubernetes).
+
+#### Step 2: Deploy MongoDB in Docker on VM2
+
+**Using Docker Compose**:
+
+Deploy a Docker container with MongoDB on VM2 using the docker-compose.yml file:
 ```
 docker-compose up -d
 ```
 
-This command will start a MongoDB instance running on port 27017. You can change configuration settings in the docker-compose.yml file.
+Verify MongoDB is accessible on localhost:27017 within VM2.
 
-#### 2. Using Kubernetes (For Scalable Testing)
-Deploy MongoDB as a StatefulSet in Kubernetes:
+**Integration Testing for Docker MongoDB**:
 
+Run initial tests against the Docker MongoDB instance to ensure all configurations and connections are set correctly. Use FastAPI or direct CLI commands from VM4 to interact with the MongoDB instance on VM2.
+
+#### Step 3: Deploy MongoDB in Kubernetes on VM3
+
+**Set Up StatefulSet and Persistent Storage**:
+
+Apply the Kubernetes manifests from the k8s folder on VM3:
 ```
 kubectl apply -f k8s/mongo-statefulset.yaml
-```
-
-This will deploy a MongoDB replica set in a Kubernetes cluster, with persistent storage for each pod.
-
-#### 3. Expose MongoDB Service
-```
+kubectl apply -f k8s/mongo-pvc.yaml
 kubectl apply -f k8s/mongo-service.yaml
 ```
 
-This creates a service to expose the MongoDB cluster so you can connect to it externally.
+**Initialize MongoDB Replica Set**:
 
-### Automated Testing
+Log into the first MongoDB pod and initialize the replica set:
+```
+kubectl exec -it mongo-0 -- mongo --eval "rs.initiate()"
+```
 
-#### 1. Unit Testing
+**Testing Kubernetes MongoDB Deployment**:
+Use FastAPI on VM4 to interact with MongoDB in the Kubernetes setup.
+Run unit and fuzz tests specifically targeting the Kubernetes-based MongoDB cluster.
 
-Unit tests are used to validate MongoDB operations (e.g., CRUD operations, connections, etc.). You can run the unit tests to validate MongoDB interactions:
+#### Step 4: Testing Framework and Verification on VM4
 
+**Run Unit Tests**:
+
+Test basic MongoDB functionality (e.g., CRUD operations, replica configuration) for both Docker and Kubernetes MongoDB instances:
 ```
 python -m unittest discover -s tests/
 ```
 
-Example unit tests include:
-* Connection tests.
-* Insert, find, update, and delete operations.
-* Replica set configuration testing.
+**Run Fuzz Tests**:
 
-#### 2. Fuzz Testing
-
-Fuzz testing randomly inputs malformed data into MongoDB operations to identify crashes and vulnerabilities. We integrate simple fuzz test and AFL to automate this process.
-
-Install python-afl on your local machine or set it up in the cloud.
-```
-pip3 install python-afl
-```
-
-Then, you can execute the following commands to run the fuzz tests:
+Run fuzz tests to validate MongoDB resilience under random and malformed inputs:
 ```
 python3 tests/test_simple_fuzz.py
 python3 tests/test_afl.py
 ```
+
+Conduct fuzz testing on both the Docker-based MongoDB instance on VM2 and the Kubernetes-based instance on VM3.
+
+## Final Testing and Documentation
+
+### Monitor and Log
+
+You can monitor logs on Docker, Kubernetes, MongoDB, and FastAPI to ensure
+stability and identify any issues during the testing process. Use kubectl
+logs for Kubernetes and docker logs for Docker MongoDB instances.
+
+### Record Results
+
+You can document performance metrics, any anomalies, and any differences
+between the Docker and Kubernetes MongoDB instances during unit and fuzz
+testing.
 
 ## Bug tracking
 
