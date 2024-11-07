@@ -1,0 +1,24 @@
+---
+- name: Open Zookeeper port on VM3
+  firewalld:
+    port: 2181/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == "vm3"
+
+- name: Open Kafka port on VM2
+  firewalld:
+    port: 9092/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == "vm2"
+
+- name: Open ML server port on VM4
+  firewalld:
+    port: 5000/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == "vm4"
+
+- name: Reload firewalld
+  command: firewall-cmd --reload
