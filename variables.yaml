@@ -1,0 +1,18 @@
+---
+local_user: "{{ ansible_user_id }}"
+cloud_user: cc
+vm_names:
+  - vm1
+  - vm2
+  - vm3
+  - vm4
+vm_image: "CC-Ubuntu22.04"
+vm_flavor: "m1.medium"
+vm_network: "CH-822922-net"
+vm_security_groups:
+  - default
+vm_key_name: "team6"
+chameleon_cloud: "CH-822922"
+openstack_password: "team6"
+inventory_file: ~/Automated_Software_Testing_for_Cloud/Inventory
+ansible_ssh_private_key_file: ~/.ssh/F24_BASTION.pem

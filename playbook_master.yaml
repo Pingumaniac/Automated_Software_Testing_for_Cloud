@@ -1,0 +1,261 @@
+---
+- name: Set global variables
+  hosts: localhost
+  connection: local
+  vars_files:
+    - variables.yaml
+  tasks:
+    - name: Set facts for use in other plays
+      set_fact:
+        local_user: "{{ local_user }}"
+        cloud_user: "{{ cloud_user }}"
+        vm_names: "{{ vm_names }}"
+        inventory_file: "{{ inventory_file }}"
+        ansible_ssh_private_key_file: "{{ ansible_ssh_private_key_file }}"
+        chameleon_cloud: "{{ chameleon_cloud }}"
+        openstack_password: "{{ openstack_password }}"
+        vm_image: "{{ vm_image }}"
+        vm_flavor: "{{ vm_flavor }}"
+        vm_network: "{{ vm_network }}"
+        vm_security_groups: "{{ vm_security_groups }}"
+        vm_key_name: "{{ vm_key_name }}"
+
+- name: Load and debug variables
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Debug variables
+      debug:
+        msg: 
+          - "local_user: {{ local_user | default('undefined') }}"
+          - "cloud_user: {{ cloud_user | default('undefined') }}"
+          - "vm_names: {{ vm_names | default('undefined') }}"
+          - "inventory_file: {{ inventory_file | default('undefined') }}"
+          - "ansible_ssh_private_key_file: {{ ansible_ssh_private_key_file | default('undefined') }}"
+          - "chameleon_cloud: {{ chameleon_cloud | default('undefined') }}"
+          - "openstack_password: {{ 'defined' if openstack_password is defined else 'undefined' }}"
+
+- name: "Check if required variables that drive the deployment are defined"
+  hosts: localhost
+  connection: local
+  tasks:
+    - import_tasks: tasks/playbook_check_variables.yaml
+
+- name: "Create VMs on Chameleon"
+  hosts: localhost
+  connection: local
+  collections:
+    - openstack.cloud
+  tasks:
+    - import_tasks: tasks/playbook_create_vms.yaml
+
+- name: "Perform fact gathering on all Cloud VMs"
+  hosts: localhost
+  remote_user: "{{ local_user }}"
+  gather_facts: no
+  become: false
+  collections:
+    - ansible.builtin
+    - openstack.cloud.collection
+  tasks:
+    - import_tasks: tasks/playbook_retrieve_facts_vms.yaml
+    - name: Refresh inventory
+      meta: refresh_inventory
+    - name: Reconfigure ansible_host for CloudVMs
+      add_host:
+        name: "{{ item.name }}"
+        ansible_host: "{{ item.ip }}"
+        ansible_user: "cc"
+        ansible_ssh_private_key_file: "~/.ssh/team6.pem"
+        ansible_ssh_common_args: '-F ~/.ssh/config -o ProxyCommand="ssh -W %h:%p -F ~/.ssh/config bastion"'
+        groups: CloudVMs
+      loop:
+        - { name: 'vm1', ip: '192.168.5.145' }
+        - { name: 'vm2', ip: '192.168.5.235' }
+        - { name: 'vm3', ip: '192.168.5.93' }
+        - { name: 'vm4', ip: '192.168.5.228' }
+
+- name: "Install basic packages and Docker on Cloud VMs"
+  hosts: CloudVMs
+  vars:
+    ansible_user: "cc"
+    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
+    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
+  remote_user: "{{ ansible_user }}"
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Wait for SSH connection
+      wait_for_connection:
+        timeout: 300
+    - name: Gather facts
+      setup:
+    - import_tasks: tasks/playbook_install_apt_packages.yaml
+    - import_tasks: tasks/playbook_install_pip_packages.yaml
+    - name: Install Docker
+      block:
+        - name: Download Docker installation script
+          get_url:
+            url: https://get.docker.com
+            dest: /tmp/get-docker.sh
+            mode: '0755'
+
+        - name: Run Docker installation script
+          command: /tmp/get-docker.sh
+          register: docker_install_result
+          changed_when: "'Docker is already installed' not in docker_install_result.stdout"
+
+        - name: Install Docker Compose
+          apt:
+            name: docker-compose
+            state: present
+            update_cache: yes
+
+        - name: Add user to docker group
+          user:
+            name: "{{ ansible_user }}"
+            groups: docker
+            append: yes
+
+        - name: Start and enable Docker service
+          systemd:
+            name: docker
+            state: started
+            enabled: yes
+
+      rescue:
+        - name: Print Docker installation error
+          debug:
+            var: docker_install_result
+
+- name: "Distribute files to VMs"
+  hosts: CloudVMs
+  vars:
+    ansible_user: "cc"
+    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
+    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
+  remote_user: "{{ ansible_user }}"
+  become: true
+  tasks:
+    - name: Create directories
+      file:
+        path: "/home/{{ ansible_user }}/{{ item }}"
+        state: directory
+      loop:
+        - producer
+        - kafka
+        - zookeeper
+        - inference_consumer
+        - db_consumer
+        - ml_server
+
+    - name: Copy files for producer (VM1)
+      copy:
+        src: "{{ item }}"
+        dest: "/home/{{ ansible_user }}/producer/"
+      loop:
+        - files/producer.py
+        - files/Dockerfile
+        - files/requirements_producer.txt
+      when: inventory_hostname == "vm1"
+
+    - name: Copy Kafka files (VM2)
+      copy:
+        src: "/tmp/kafka.tgz"
+        dest: "/home/{{ ansible_user }}/kafka/kafka.tgz"
+      when: inventory_hostname == "vm2"
+
+    - name: Copy Zookeeper files (VM3)
+      copy:
+        src: "/tmp/kafka.tgz"
+        dest: "/home/{{ ansible_user }}/zookeeper/kafka.tgz"
+      when: inventory_hostname == "vm3"
+
+    - name: Copy files for inference consumer (VM3)
+      copy:
+        src: "{{ item }}"
+        dest: "/home/{{ ansible_user }}/inference_consumer/"
+      loop:
+        - files/inference_consumer.py
+        - files/Dockerfile
+        - files/requirements_inference.txt
+      when: inventory_hostname == "vm3"
+
+    - name: Copy files for db consumer and ML server (VM4)
+      copy:
+        src: "{{ item }}"
+        dest: "/home/{{ ansible_user }}/{{ item | basename | regex_replace('_.*', '') }}/"
+      loop:
+        - files/db_consumer.py
+        - files/Dockerfile
+        - files/requirements_db_consumer.txt
+        - files/ml_server.py
+        - files/Dockerfile
+        - files/requirements_ml_server.txt
+      when: inventory_hostname == "vm4"
+
+- name: "Configure firewall rules"
+  hosts: CloudVMs
+  vars:
+    ansible_user: "cc"
+    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
+    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
+  remote_user: "{{ ansible_user }}"
+  become: true
+  tasks:
+    - name: Open necessary ports
+      firewalld:
+        port: "{{ item }}/tcp"
+        permanent: yes
+        state: enabled
+      loop:
+        - 22   # SSH
+        - 2181 # Zookeeper
+        - 9092 # Kafka
+        - 27017 # MongoDB
+        - 5000 # ML Server
+    - name: Reload firewall
+      command: firewall-cmd --reload
+
+- name: "Install MongoDB on VM3"
+  hosts: vm3
+  vars:
+    ansible_user: "cc"
+    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
+    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
+  remote_user: "{{ ansible_user }}"
+  become: yes
+  tasks:
+    - name: Install gnupg and curl
+      apt:
+        name: 
+          - gnupg
+          - curl
+        state: present
+        update_cache: yes
+    - name: Import MongoDB public GPG Key
+      shell: curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor
+      args:
+        creates: /usr/share/keyrings/mongodb-server-8.0.gpg
+    - name: Add MongoDB Repository
+      shell: echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+      args:
+        creates: /etc/apt/sources.list.d/mongodb-org-8.0.list
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+    - name: Install MongoDB
+      apt:
+        name: mongodb-org
+        state: present
+    - name: Configure MongoDB to bind to all IPs
+      lineinfile:
+        path: /etc/mongod.conf
+        regexp: '^  bindIp:'
+        line: '  bindIp: 0.0.0.0'
+        backrefs: yes
+    - name: Start MongoDB service
+      systemd:
+        name: mongod
+        state: started
+        enabled: yes

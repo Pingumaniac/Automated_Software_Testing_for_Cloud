@@ -1,0 +1,11 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install required apt packages
+  apt:
+    name:
+      - python3-pip
+      - openjdk-11-jdk
+    state: present
