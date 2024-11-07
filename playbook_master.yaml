@@ -26,7 +26,7 @@
   tasks:
     - name: Debug variables
       debug:
-        msg: 
+        msg:
           - "local_user: {{ local_user | default('undefined') }}"
           - "cloud_user: {{ cloud_user | default('undefined') }}"
           - "vm_names: {{ vm_names | default('undefined') }}"
@@ -128,72 +128,6 @@
           debug:
             var: docker_install_result
 
-- name: "Distribute files to VMs"
-  hosts: CloudVMs
-  vars:
-    ansible_user: "cc"
-    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
-    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
-  remote_user: "{{ ansible_user }}"
-  become: true
-  tasks:
-    - name: Create directories
-      file:
-        path: "/home/{{ ansible_user }}/{{ item }}"
-        state: directory
-      loop:
-        - producer
-        - kafka
-        - zookeeper
-        - inference_consumer
-        - db_consumer
-        - ml_server
-
-    - name: Copy files for producer (VM1)
-      copy:
-        src: "{{ item }}"
-        dest: "/home/{{ ansible_user }}/producer/"
-      loop:
-        - files/producer.py
-        - files/Dockerfile
-        - files/requirements_producer.txt
-      when: inventory_hostname == "vm1"
-
-    - name: Copy Kafka files (VM2)
-      copy:
-        src: "/tmp/kafka.tgz"
-        dest: "/home/{{ ansible_user }}/kafka/kafka.tgz"
-      when: inventory_hostname == "vm2"
-
-    - name: Copy Zookeeper files (VM3)
-      copy:
-        src: "/tmp/kafka.tgz"
-        dest: "/home/{{ ansible_user }}/zookeeper/kafka.tgz"
-      when: inventory_hostname == "vm3"
-
-    - name: Copy files for inference consumer (VM3)
-      copy:
-        src: "{{ item }}"
-        dest: "/home/{{ ansible_user }}/inference_consumer/"
-      loop:
-        - files/inference_consumer.py
-        - files/Dockerfile
-        - files/requirements_inference.txt
-      when: inventory_hostname == "vm3"
-
-    - name: Copy files for db consumer and ML server (VM4)
-      copy:
-        src: "{{ item }}"
-        dest: "/home/{{ ansible_user }}/{{ item | basename | regex_replace('_.*', '') }}/"
-      loop:
-        - files/db_consumer.py
-        - files/Dockerfile
-        - files/requirements_db_consumer.txt
-        - files/ml_server.py
-        - files/Dockerfile
-        - files/requirements_ml_server.txt
-      when: inventory_hostname == "vm4"
-
 - name: "Configure firewall rules"
   hosts: CloudVMs
   vars:
@@ -228,7 +162,7 @@
   tasks:
     - name: Install gnupg and curl
       apt:
-        name: 
+        name:
           - gnupg
           - curl
         state: present
