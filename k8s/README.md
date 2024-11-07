@@ -2,6 +2,9 @@
 
 ### Set Up
 1. Set up K8 with `vm1` as master and `vm2`, `vm3`, `vm4` as workers
+
+Next, run 2-9 on `vm1`.
+
 2. Install Local Path Provisioner
     ```
     kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.30/deploy/local-path-storage.yaml

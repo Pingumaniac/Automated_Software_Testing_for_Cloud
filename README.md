@@ -154,7 +154,9 @@ sudo bash install_mongodb.sh
 
 ### 3. Set up Kubernetes
 
-#### a. Set up K8 with `vm1` as master and `vm2`, `vm3`, `vm4` as workers
+#### a. Set up K8 with `vm1` as master and `vm2`, `vm3`, `vm4` as workers.
+
+Next, run b-i on `vm1`.
 
 #### b. Install Local Path Provisioner
 ```
