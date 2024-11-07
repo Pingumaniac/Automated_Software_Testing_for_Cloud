@@ -44,6 +44,7 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 3. Python 3.12.6: For running benchmark and test scripts.
 4. MongoDB CLI Tools: To interact with MongoDB from the command line.
 5. OpenStack CLI: To use Chameleon Cloud for provisioning resources.
+6. Ansible: To automate provisioning and configuration of Chameleon Cloud.
 6. American Fuzzy Lop (AFL): For fuzz testing.
 
 ## How to build this software
