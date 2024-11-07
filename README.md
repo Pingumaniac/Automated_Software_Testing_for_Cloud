@@ -1,6 +1,4 @@
-# Automated_Software_Testing_for_Cloud
-
-This project automates the deployment, configuration, and evaluation of MongoDB clusters using Docker and Kubernetes, with built-in support for unit testing and fuzz testing. The goal is to provide a framework for testing MongoDB performance, scalability, and reliability in various environments, including Chameleon Cloud.
+g
 
 ## About Members
 
@@ -136,32 +134,71 @@ git clone https://github.com/Pingumaniac/Automated_Software_Testing_for_Cloud.gi
 cd Automated_Software_Testing_for_Cloud
 ```
 
-### 2. Install Python Dependencies:
+### 2. Set up Docker
+
+To install Docker on Linux, run
 ```
-pip install -r requirements.txt
+sudo bash install_docker.sh
 ```
 
-### 3. Set up Environment Variables
- If deploying on Chameleon Cloud or using a custom MongoDB URI, configure your environment variables by editing the setup-env-template.sh.
+To retrieve the MongoDB Docker container, run
+```
+sudo bash install_mongodb.sh
+```
 
-### 4. Set up Kubernetes
+### 3. Set up Kubernetes
 
-#### a. Install Kubernetes if not already installed:
-```
-sudo apt-get install -y kubeadm kubectl kubelet
-```
-#### b. Deploy MongoDB StatefulSet:
-```
-kubectl apply -f k8s/mongo-statefulset.yaml
-```
-#### c. Expose the MongoDB Service:
-```
-kubectl apply -f k8s/mongo-service.yaml
-```
-#### d. Initialize MongoDB Replica Set:
-```
-kubectl exec -it mongo-0 -- mongo --eval "rs.initiate()"
-```
+a. Set up K8 with `vm1` as master and `vm2`, `vm3`, `vm4` as workers
+b. Install Local Path Provisioner
+    ```
+    kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.30/deploy/local-path-storage.yaml
+    ```
+c. Create service to connect Mongo nodes
+    ```
+    kubectl apply -f mongo-service.yaml
+    ```
+d. Check service creation with
+    ```
+    kubectl get service
+    ```
+e. Create 3 Mongo containers on the 3 worker VMs with Statefulset
+    ```
+    kubectl apply -f mongo-statefulset.yaml
+    ```
+f. Check pod creation with
+    ```
+    kubectl get pods
+    ```
+g. Enter into MongoDB instance
+    ```
+    kubectl exec -it mongo-0 -- mongo
+    ```
+h. Create 3 replica sets
+    ```
+    rs.initiate({
+        "_id" : "rs0",
+        "members" : [
+            {
+                    "_id" : 0,
+                    "host" : "mongo-0.mongo.default.svc.cluster.local:27017",
+            },
+            {
+                    "_id" : 1,
+                    "host" : "mongo-1.mongo.default.svc.cluster.local:27017",
+            },
+            {
+                    "_id" : 2,
+                    "host" : "mongo-2.mongo.default.svc.cluster.local:27017",
+            }
+        ]
+    })
+    ```
+i. Ensure replica sets are initialized by running this command in the mongo shell on all VMs
+    ```
+    kubectl exec -it mongo-[0|1|2] -- mongo
+
+    rs.status()
+    ```
 
 ## How to test this software
 
