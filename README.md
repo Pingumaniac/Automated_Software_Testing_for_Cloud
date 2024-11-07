@@ -47,6 +47,87 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 6. Ansible: To automate provisioning and configuration of Chameleon Cloud.
 6. American Fuzzy Lop (AFL): For fuzz testing.
 
+## VM Distribution and Roles
+
+This project utilizes Docker, Kubernetes, and Ansible across a four-VM
+setup to automate the deployment, configuration, and testing of MongoDB
+clusters. Each VM is designated for specific roles to maximize efficiency,
+scalability, and reliability.
+
+### VM1: Control and Orchestration Node
+
+- **Tools**:
+  - **Ansible**: Automates the setup and management of Docker, Kubernetes,
+  and MongoDB configurations on other VMs.
+  - **OpenStack CLI**: Manages cloud resources on Chameleon Cloud.
+  - **Kubernetes CLI** (`kubectl`): Controls Kubernetes deployments across
+  VMs.
+
+- **Role**:
+  - Serves as the primary orchestration node, running Ansible playbooks
+  to deploy and configure services on VM2, VM3, and VM4.
+  - Manages testing workflows, including setup and teardown, to ensure
+  each service is deployed correctly and can communicate across VMs.
+  - Acts as the control point for testing environments, deploying and
+  monitoring MongoDB configurations across Docker and Kubernetes.
+
+### VM2: Primary MongoDB Node
+
+- **Tools**:
+  - **Docker**: Hosts MongoDB in a container for isolated deployment.
+  - **Kubernetes**: Operates as a Kubernetes worker node, enabling MongoDB
+  to be managed in a StatefulSet configuration with persistent storage.
+
+- **Role**:
+  - Acts as the primary MongoDB instance or leader in the MongoDB
+  Kubernetes StatefulSet.
+  - Maintains persistent storage managed by Kubernetes for data durability
+  across pod restarts or migrations.
+  - Supports replication and high availability as part of a clustered
+  MongoDB setup, essential for scalability and reliability testing.
+
+### VM3: Testing and API Server
+
+- **Tools**:
+  - **Python**: Runs unit and fuzz testing scripts on MongoDB deployments.
+  - **FastAPI**: Provides an API interface to interact with MongoDB for
+  testing CRUD operations and replica management.
+  - **Docker**: Hosts FastAPI in a containerized environment, facilitating
+  easy deployment and scaling of API endpoints.
+  - **Kubernetes (optional)**: Manages the deployment and scaling of
+  testing services if needed.
+
+- **Role**:
+  - Hosts unit and fuzz tests targeting both Docker and Kubernetes MongoDB
+  instances to validate functionality, reliability, and performance.
+  - Exposes an API via FastAPI, allowing CRUD operations and MongoDB
+  interactions through standardized endpoints.
+  - Acts as the central interface for testing MongoDB operations across
+  multiple environments, supporting API-driven tests, fuzzing, and load tests.
+
+### VM4: MongoDB Replica Node
+
+- **Tools**:
+  - **Docker**: Runs MongoDB as a containerized replica.
+  - **Kubernetes**: Functions as a worker node in the Kubernetes cluster
+  to provide replication and high availability in coordination with VM2.
+
+- **Role**:
+  - Acts as a replica node in the MongoDB Kubernetes StatefulSet, ensuring
+  data redundancy and high availability.
+  - Synchronizes data with the primary MongoDB instance on VM2, providing
+  a robust environment for testing replica set configurations.
+  - Contributes to the Kubernetes-managed high-availability MongoDB
+  cluster, supporting failover, replication, and resiliency tests.
+
+
+This VM distribution maximizes the project’s flexibility by leveraging
+Docker for containerized MongoDB deployments, Kubernetes for
+high-availability and clustered management, and Ansible for orchestration
+and automation. This setup facilitates comprehensive testing of MongoDB
+across different environments, ensuring reliability, scalability, and
+performance.
+
 ## How to build this software
 
 ### 1. Clone this repository
