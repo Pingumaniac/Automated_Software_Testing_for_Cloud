@@ -272,6 +272,7 @@ kubectl exec -it mongo-0 -- mongo --eval "rs.initiate()"
 ```
 
 **Testing Kubernetes MongoDB Deployment**:
+
 Use FastAPI on VM4 to interact with MongoDB in the Kubernetes setup.
 Run unit and fuzz tests specifically targeting the Kubernetes-based MongoDB cluster.
 
