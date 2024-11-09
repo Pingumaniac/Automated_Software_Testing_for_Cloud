@@ -3,7 +3,7 @@ import json
 import argparse
 import os
 import openstack
-from src.mongo_client import MongoDBClient  # Import your MongoDB client
+from mongo_client import MongoClientManager  # Import your MongoDB client
 from faker import Faker  # Used for generating random test data
 
 class Setup:
@@ -15,7 +15,7 @@ class Setup:
         self.fake = Faker()
 
     def get_instance_addresses(self):
-        """Return a list of dicts {'public_ip': '', 'private_ip': ''} for each Chameleon Cloud instance."""
+        """Return a list of dicts {'name': '', 'public': '', 'private': ''} for each Chameleon Cloud instance."""
         instances = self.conn.compute.servers()
         addresses = []
 
@@ -29,7 +29,7 @@ class Setup:
         return addresses
 
     def run_ansible_playbook(self):
-        """Run ansible playbook to install and start MongoDB on provided hosts."""
+        """Run an Ansible playbook to install and start MongoDB on provided hosts."""
         playbook_cmd = "ansible-playbook -i hosts.ini mongo-playbook.yml"
         os.environ['ANSIBLE_HOST_KEY_CHECKING'] = 'False'
         print(f'Running playbook with ansible: `{playbook_cmd}`')
@@ -61,11 +61,12 @@ class Setup:
 
     def insert_test_data(self, collection_name='testdata', num_docs=500):
         """Insert random test data into MongoDB."""
-        db_client = MongoDBClient()  # Assuming MongoDBClient is set up to connect to your MongoDB instance
+        db_client = MongoClientManager(uri="mongodb://192.168.5.211:27017,192.168.5.68:27017,192.168.5.25:27017/?replicaSet=rs0")
         db_client.connect()
         documents = self.generate_random_documents(num_docs)
-        db_client.insert_one(collection_name, documents)
-        print(f'Successfully inserted {num_docs} documents into MongoDB.')
+        for document in documents:
+            db_client.insert_one(collection_name, document)
+        print(f'Successfully inserted {num_docs} documents into MongoDB replica set.')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup script for MongoDB and FastAPI.')
