@@ -1,23 +1,11 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12-slim
+# Use MongoDB as the base image
+FROM mongo:6.0
 
-# Set the working directory inside the container
-WORKDIR /app
+# Expose the MongoDB port
+EXPOSE 27017
 
-# Copy the requirements.txt file into the container
-COPY requirements.txt .
+# Copy a custom MongoDB config file if needed (optional)
+COPY mongo.conf /etc/mongo/mongo.conf
 
-# Install the necessary Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application files into the container
-COPY . .
-
-# Set environment variables for MongoDB connection (optional if you're using .env or another method)
-ENV MONGO_URI="mongodb://admin:admin123@mongo:27017/testdb?authSource=admin"
-
-# Expose the port your application runs on (adjust if necessary)
-EXPOSE 5000
-
-# Command to run your FastAPI application using Uvicorn
-CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Run MongoDB with replication enabled (this command assumes you configure replication)
+CMD ["mongod", "--replSet", "rs0", "--bind_ip_all"]
