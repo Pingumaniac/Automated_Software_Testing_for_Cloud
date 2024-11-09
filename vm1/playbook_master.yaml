@@ -70,10 +70,10 @@
         ansible_ssh_common_args: '-F ~/.ssh/config -o ProxyCommand="ssh -W %h:%p -F ~/.ssh/config bastion"'
         groups: CloudVMs
       loop:
-        - { name: 'vm1', ip: '192.168.5.145' }
-        - { name: 'vm2', ip: '192.168.5.235' }
-        - { name: 'vm3', ip: '192.168.5.93' }
-        - { name: 'vm4', ip: '192.168.5.228' }
+        - { name: 'vm1', ip: '192.168.5.56' }
+        - { name: 'vm2', ip: '192.168.5.211' }
+        - { name: 'vm3', ip: '192.168.5.68' }
+        - { name: 'vm4', ip: '192.168.5.25' }
 
 - name: "Install basic packages and Docker on Cloud VMs"
   hosts: CloudVMs
