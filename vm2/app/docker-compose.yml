@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:4.4
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - mongo-network
+
+  app:
+    build: ./app  # Dockerfile should be in ./app
+    container_name: mongo-app
+    restart: always
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://admin:admin123@mongo:27017/testdb?authSource=admin
+    networks:
+      - mongo-network
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  mongo-network:
+    driver: bridge
