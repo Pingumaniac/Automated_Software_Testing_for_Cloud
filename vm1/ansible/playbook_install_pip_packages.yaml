@@ -2,7 +2,6 @@
 - name: Install required pip packages
   pip:
     name:
-      - kafka-python==2.0.2
       - pymongo==4.9.1
       - pytest==8.3.3
       - mongomock==4.2.0.post1

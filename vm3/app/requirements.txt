@@ -12,7 +12,7 @@ fastapi==0.115.0
 # Uvicorn is an ASGI server for serving FastAPI apps
 uvicorn==0.31.0
 # Pydantic is used by FastAPI for data validation
-pydantic==2.92
+pydantic==2.9.2
 # Matplotlib for visualization
 matplotlib==3.9.2
 # dnspython is required when using MongoDB with DNS SRV records (e.g., with MongoDB Atlas)
