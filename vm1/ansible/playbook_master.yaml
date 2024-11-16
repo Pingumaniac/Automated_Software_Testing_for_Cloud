@@ -20,28 +20,13 @@
         vm_security_groups: "{{ vm_security_groups }}"
         vm_key_name: "{{ vm_key_name }}"
 
-- name: Load and debug variables
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Debug variables
-      debug:
-        msg:
-          - "local_user: {{ local_user | default('undefined') }}"
-          - "cloud_user: {{ cloud_user | default('undefined') }}"
-          - "vm_names: {{ vm_names | default('undefined') }}"
-          - "inventory_file: {{ inventory_file | default('undefined') }}"
-          - "ansible_ssh_private_key_file: {{ ansible_ssh_private_key_file | default('undefined') }}"
-          - "chameleon_cloud: {{ chameleon_cloud | default('undefined') }}"
-          - "openstack_password: {{ 'defined' if openstack_password is defined else 'undefined' }}"
-
-- name: "Check if required variables that drive the deployment are defined"
+- name: Validate required variables
   hosts: localhost
   connection: local
   tasks:
     - import_tasks: tasks/playbook_check_variables.yaml
 
-- name: "Create VMs on Chameleon"
+- name: Create VMs on Chameleon Cloud
   hosts: localhost
   connection: local
   collections:
@@ -49,41 +34,27 @@
   tasks:
     - import_tasks: tasks/playbook_create_vms.yaml
 
-- name: "Perform fact gathering on all Cloud VMs"
+- name: Gather facts and configure Cloud VMs
   hosts: localhost
   remote_user: "{{ local_user }}"
-  gather_facts: no
   become: false
-  collections:
-    - ansible.builtin
-    - openstack.cloud.collection
   tasks:
     - import_tasks: tasks/playbook_retrieve_facts_vms.yaml
     - name: Refresh inventory
       meta: refresh_inventory
-    - name: Reconfigure ansible_host for CloudVMs
+    - name: Add CloudVMs to inventory
       add_host:
         name: "{{ item.name }}"
         ansible_host: "{{ item.ip }}"
         ansible_user: "cc"
         ansible_ssh_private_key_file: "~/.ssh/team6.pem"
-        ansible_ssh_common_args: '-F ~/.ssh/config -o ProxyCommand="ssh -W %h:%p -F ~/.ssh/config bastion"'
         groups: CloudVMs
-      loop:
-        - { name: 'vm1', ip: '192.168.5.56' }
-        - { name: 'vm2', ip: '192.168.5.211' }
-        - { name: 'vm3', ip: '192.168.5.68' }
-        - { name: 'vm4', ip: '192.168.5.25' }
+      loop: "{{ vm_names | zip(vm_ips) | map('flatten') }}"
 
-- name: "Install basic packages and Docker on Cloud VMs"
+- name: Install dependencies on Cloud VMs
   hosts: CloudVMs
-  vars:
-    ansible_user: "cc"
-    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
-    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
-  remote_user: "{{ ansible_user }}"
   become: true
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Wait for SSH connection
       wait_for_connection:
@@ -93,48 +64,10 @@
     - import_tasks: tasks/playbook_install_apt_packages.yaml
     - import_tasks: tasks/playbook_install_pip_packages.yaml
     - name: Install Docker
-      block:
-        - name: Download Docker installation script
-          get_url:
-            url: https://get.docker.com
-            dest: /tmp/get-docker.sh
-            mode: '0755'
+      import_tasks: tasks/playbook_install_docker.yaml
 
-        - name: Run Docker installation script
-          command: /tmp/get-docker.sh
-          register: docker_install_result
-          changed_when: "'Docker is already installed' not in docker_install_result.stdout"
-
-        - name: Install Docker Compose
-          apt:
-            name: docker-compose
-            state: present
-            update_cache: yes
-
-        - name: Add user to docker group
-          user:
-            name: "{{ ansible_user }}"
-            groups: docker
-            append: yes
-
-        - name: Start and enable Docker service
-          systemd:
-            name: docker
-            state: started
-            enabled: yes
-
-      rescue:
-        - name: Print Docker installation error
-          debug:
-            var: docker_install_result
-
-- name: "Configure firewall rules"
+- name: Configure firewall rules
   hosts: CloudVMs
-  vars:
-    ansible_user: "cc"
-    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
-    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
-  remote_user: "{{ ansible_user }}"
   become: true
   tasks:
     - name: Open necessary ports
@@ -144,21 +77,14 @@
         state: enabled
       loop:
         - 22   # SSH
-        - 2181 # Zookeeper
-        - 9092 # Kafka
         - 27017 # MongoDB
-        - 5000 # ML Server
+        - 5000 # FastAPI
     - name: Reload firewall
       command: firewall-cmd --reload
 
-- name: "Install MongoDB on VM3"
+- name: Install and configure MongoDB on VM3
   hosts: vm3
-  vars:
-    ansible_user: "cc"
-    ansible_ssh_private_key_file: "~/.ssh/team6.pem"
-    ansible_ssh_common_args: '-F /home/roberthsheng/.ssh/config -o ProxyCommand="ssh -W %h:%p -F /home/roberthsheng/.ssh/config bastion"'
-  remote_user: "{{ ansible_user }}"
-  become: yes
+  become: true
   tasks:
     - name: Install gnupg and curl
       apt:
@@ -193,3 +119,25 @@
         name: mongod
         state: started
         enabled: yes
+
+- name: Deploy FastAPI on VM4
+  hosts: vm4
+  become: true
+  tasks:
+    - name: Install Python dependencies for FastAPI
+      pip:
+        name:
+          - fastapi
+          - uvicorn
+          - pydantic
+          - dnspython
+        state: present
+    - name: Deploy FastAPI application
+      copy:
+        src: /path/to/fastapi/app
+        dest: /opt/fastapi/app
+    - name: Start FastAPI server
+      shell: |
+        nohup uvicorn app.main:app --host 0.0.0.0 --port 5000 &
+      args:
+        chdir: /opt/fastapi/app
