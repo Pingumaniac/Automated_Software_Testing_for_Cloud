@@ -231,7 +231,7 @@ Example Ansible commands:
 ansible-playbook -i Inventory playbook_install_docker.yaml
 ansible-playbook -i Inventory playbook_install_kubernetes.yaml
 ansible-playbook -i Inventory playbook_check_variables.yaml
-ansible-playbook -i Inentory playbook_create_vms.yaml
+ansible-playbook -i Inventory playbook_create_vms.yaml
 ansible-playbook -i Inventory playbook_install_apt_packages.yaml
 ansible-playbook -i Inventory playbook_install_pip_packages.yaml
 ansible-playbook -i Inventory playbook_master.yaml
