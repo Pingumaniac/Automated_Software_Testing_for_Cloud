@@ -52,7 +52,7 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 
 ## VM Distribution and Roles
 
-This project utilizes Docker, Kubernetes, and Ansible across a four-VM
+This project utilizes Docker and Kubernetes across a four-VM
 setup to automate the deployment, configuration, and testing of MongoDB
 clusters. Each VM is designated for specific roles to maximize efficiency,
 scalability, and reliability.
