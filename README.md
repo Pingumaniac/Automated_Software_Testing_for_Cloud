@@ -48,7 +48,6 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 3. Python 3.12.6: For running benchmark and test scripts.
 4. MongoDB CLI Tools: To interact with MongoDB from the command line.
 5. OpenStack CLI: To use Chameleon Cloud for provisioning resources.
-6. Ansible: To automate provisioning and configuration of Chameleon Cloud.
 6. American Fuzzy Lop (AFL): For fuzz testing.
 
 ## VM Distribution and Roles
@@ -61,8 +60,6 @@ scalability, and reliability.
 ### VM1: Control and Orchestration Node
 
 - **Tools**:
-  - **Ansible**: Automates the setup and management of Docker, Kubernetes,
-  and MongoDB configurations on other VMs.
   - **OpenStack CLI**: Manages cloud resources on Chameleon Cloud.
   - **Kubernetes CLI** (`kubectl`): Controls Kubernetes deployments across
   VMs.
@@ -220,7 +217,7 @@ rs.status()
 
 ### Steps for Full Setup
 
-#### Step 1: VM1 – Initial Configuration and Orchestration
+#### Step 0: VM1 – Initial Configuration and Orchestration thorugh Ansible (Optional)
 
 **Environment Setup with Ansible**:
 
@@ -245,7 +242,7 @@ Manage Kubernetes configuration on VM3 and Docker container setups on VM2 direct
 
 Set up a FastAPI server and testing scripts (unit and fuzz tests) on VM4 to access both MongoDB instances (from Docker and Kubernetes).
 
-#### Step 2: Deploy MongoDB in Docker on VM2
+#### Step 1: Deploy MongoDB in Docker on VM2
 
 **Using Docker Compose**:
 
@@ -260,7 +257,7 @@ Verify MongoDB is accessible on localhost:27017 within VM2.
 
 Run initial tests against the Docker MongoDB instance to ensure all configurations and connections are set correctly. Use FastAPI or direct CLI commands from VM4 to interact with the MongoDB instance on VM2.
 
-#### Step 3: Deploy MongoDB in Kubernetes on VM3
+#### Step 2: Deploy MongoDB in Kubernetes on VM3
 
 **Set Up StatefulSet and Persistent Storage**:
 
@@ -283,7 +280,7 @@ kubectl exec -it mongo-0 -- mongo --eval "rs.initiate()"
 Use FastAPI on VM4 to interact with MongoDB in the Kubernetes setup.
 Run unit and fuzz tests specifically targeting the Kubernetes-based MongoDB cluster.
 
-#### Step 4: Testing Framework and Verification on VM4
+#### Step 3: Testing Framework and Verification on VM4
 
 **Run Unit Tests**:
 
