@@ -9,7 +9,7 @@
       - faker==30.3.0
       - fastapi==0.115.0
       - uvicorn==0.31.0
-      - pydantic==2.92
+      - pydantic==2.9.2
       - matplotlib==3.9.2
       - dnspython==2.6.1
       - PyYAML==6.0.2
