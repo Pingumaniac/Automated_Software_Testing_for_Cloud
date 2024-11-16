@@ -14,5 +14,5 @@ vm_security_groups:
 vm_key_name: "team6"
 chameleon_cloud: "CH-822922"
 openstack_password: "team6"
-inventory_file: ~/Automated_Software_Testing_for_Cloud/Inventory
+inventory_file: ~/project/ansible/Inventory
 ansible_ssh_private_key_file: ~/.ssh/F24_BASTION.pem

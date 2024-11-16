@@ -226,7 +226,7 @@ rs.status()
 
 Use Ansible on VM1 to install Docker on VM2 and Kubernetes on VM3. This configuration enables MongoDB clusters and configurations across Docker and Kubernetes environments.
 
-Example Ansible command:
+Example Ansible commands:
 ```
 ansible-playbook -i Inventory playbook_install_docker.yaml
 ansible-playbook -i Inventory playbook_install_kubernetes.yaml
