@@ -1,5 +1,5 @@
 ## Instructions
 
-To install Docker on Linux, run `sudo bash install_docker.sh`
+To retrieve the MongoDB Docker container, run `sudo bash install_mongodb_image.sh`
 
-To retrieve the MongoDB Docker container, run `sudo bash install_mongodb.sh`
+We have installed docker image through `docker build -t vm2-image -f Dockerfile .`
