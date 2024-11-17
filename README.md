@@ -123,9 +123,8 @@ scalability, and reliability.
 
 
 This VM distribution maximizes the project’s flexibility by leveraging
-Docker for containerized MongoDB deployments, Kubernetes for
-high-availability and clustered management, and Ansible for orchestration
-and automation. This setup facilitates comprehensive testing of MongoDB
+Docker for containerized MongoDB deployments, and Kubernetes for
+high-availability and clustered management. This setup facilitates comprehensive testing of MongoDB
 across different environments, ensuring reliability, scalability, and
 performance.
 
