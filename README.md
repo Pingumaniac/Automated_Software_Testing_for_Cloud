@@ -216,31 +216,6 @@ rs.status()
 
 ### Steps for Full Setup
 
-#### Step 0: VM1 – Initial Configuration and Orchestration thorugh Ansible (Optional)
-
-**Environment Setup with Ansible**:
-
-Use Ansible on VM1 to install Docker on VM2 and Kubernetes on VM3. This configuration enables MongoDB clusters and configurations across Docker and Kubernetes environments.
-
-Example Ansible commands:
-```
-ansible-playbook -i Inventory playbook_install_docker.yaml
-ansible-playbook -i Inventory playbook_install_kubernetes.yaml
-ansible-playbook -i Inventory playbook_check_variables.yaml
-ansible-playbook -i Inventory playbook_create_vms.yaml
-ansible-playbook -i Inventory playbook_install_apt_packages.yaml
-ansible-playbook -i Inventory playbook_install_pip_packages.yaml
-ansible-playbook -i Inventory playbook_master.yaml
-ansible-playbook -i Inventory playbook_retrieve_facts_vms.yaml
-ansible-playbook -i Inventory playbook_set_firewalid_rules.yaml
-```
-
-Manage Kubernetes configuration on VM3 and Docker container setups on VM2 directly through Ansible.
-
-**Control API and Testing**:
-
-Set up a FastAPI server and testing scripts (unit and fuzz tests) on VM4 to access both MongoDB instances (from Docker and Kubernetes).
-
 #### Step 1: Deploy MongoDB in Docker on VM2
 
 **Using Docker Compose**:
