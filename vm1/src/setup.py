@@ -28,18 +28,6 @@ class Setup:
             })
         return addresses
 
-    def run_ansible_playbook(self):
-        """Run an Ansible playbook to install and start MongoDB on provided hosts."""
-        playbook_cmd = "ansible-playbook -i hosts.ini mongo-playbook.yml"
-        os.environ['ANSIBLE_HOST_KEY_CHECKING'] = 'False'
-        print(f'Running playbook with ansible: `{playbook_cmd}`')
-        process = subprocess.Popen(playbook_cmd.split())
-        output, error = process.communicate()
-        if error:
-            print(f'Error: {error}')
-        else:
-            print(output)
-
     def build_hosts_json_file(self):
         """Generate hosts.json using instance details from Chameleon Cloud."""
         hosts = {'hosts': self.get_instance_addresses()}
@@ -80,9 +68,6 @@ if __name__ == "__main__":
 
     if args.generate_hosts:
         setup.build_hosts_json_file()
-
-    if args.run_ansible:
-        setup.run_ansible_playbook()
 
     if args.insert_data:
         setup.insert_test_data()
