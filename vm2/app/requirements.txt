@@ -1,27 +1,27 @@
 # MongoDB Python Driver for interacting with MongoDB
-pymongo==4.9.1
+pymongo
 # Pytest for running unit tests
-pytest==8.3.3
+pytest
 # MongoMock for mocking MongoDB operations in unit tests
-mongomock==4.2.0.post1
+mongomock
 # Fuzz testing integration
-python-afl==0.7.3
-faker==30.3.0
+python-afl
+faker
 # FastAPI for building high-performance APIs
-fastapi==0.115.0
+fastapi
 # Uvicorn is an ASGI server for serving FastAPI apps
-uvicorn==0.31.0
+uvicorn
 # Pydantic is used by FastAPI for data validation
-pydantic==2.9.2
+pydantic
 # Matplotlib for visualization
-matplotlib==3.9.2
+matplotlib
 # dnspython is required when using MongoDB with DNS SRV records (e.g., with MongoDB Atlas)
-dnspython==2.6.1
+dnspython
 # PyYAML is useful for handling configuration files in YAML format (e.g., for Kubernetes manifests)
-PyYAML==6.0.2
+PyYAML
 # Kubernetes Python Client (Optional: If you need to interact with Kubernetes clusters programmatically)
-kubernetes==31.0.0
+kubernetes
 # OpenStack SDK (Optional: if deploying MongoDB on Chameleon Cloud using OpenStack API)
-openstacksdk==4.0.0
-# others
-yaspin==0.5.0
+openstacksdk
+# Others
+yaspin
