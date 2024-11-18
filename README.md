@@ -65,12 +65,10 @@ scalability, and reliability.
   VMs.
 
 - **Role**:
-  - Serves as the primary orchestration node, running Ansible playbooks
-  to deploy and configure services on VM2, VM3, and VM4.
-  - Manages testing workflows, including setup and teardown, to ensure
-  each service is deployed correctly and can communicate across VMs.
   - Acts as the control point for testing environments, deploying and
   monitoring MongoDB configurations across Docker and Kubernetes.
+  - Manages testing workflows, including setup and teardown, to ensure
+  each service is deployed correctly and can communicate across VMs.
 
 ### VM2: Primary MongoDB Node
 
@@ -93,14 +91,10 @@ scalability, and reliability.
   - **Python**: Runs unit and fuzz testing scripts on MongoDB deployments.
   - **FastAPI**: Provides an API interface to interact with MongoDB for
   testing CRUD operations and replica management.
-  - **Docker**: Hosts FastAPI in a containerized environment, facilitating
-  easy deployment and scaling of API endpoints.
-  - **Kubernetes (optional)**: Manages the deployment and scaling of
-  testing services if needed.
 
 - **Role**:
-  - Hosts unit and fuzz tests targeting both Docker and Kubernetes MongoDB
-  instances to validate functionality, reliability, and performance.
+  - Hosts unit and fuzz tests targeting both MongoDB
+  instances in vm2 and vm4 to validate functionality, reliability, and performance.
   - Exposes an API via FastAPI, allowing CRUD operations and MongoDB
   interactions through standardized endpoints.
   - Acts as the central interface for testing MongoDB operations across
