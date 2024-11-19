@@ -59,7 +59,6 @@ class Setup:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Setup script for MongoDB and FastAPI.')
     parser.add_argument('--generate-hosts', action='store_true', help='Generate hosts.json file for Chameleon Cloud instances.')
-    parser.add_argument('--run-ansible', action='store_true', help='Run ansible playbook to install MongoDB.')
     parser.add_argument('--insert-data', action='store_true', help='Insert test data into MongoDB.')
 
     args = parser.parse_args()
