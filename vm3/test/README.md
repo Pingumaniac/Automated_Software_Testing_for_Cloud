@@ -1,4 +1,4 @@
-# List of possible etrics for mesauring MongoDB functionality
+# List of possible metrics for measuring MongoDB functionality
 
 ## 1. Functional Metrics
 
