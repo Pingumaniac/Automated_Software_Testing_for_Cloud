@@ -11,20 +11,12 @@
 ### 1.2 Replica Set Metrics
 * Replication Lag (ms): Time difference between when a write is applied to the primary node and when it is replicated to secondaries.
 
-### 1.3 Index Metrics
-* Index Build Time (s): Time taken to build an index on a collection with varying sizes.
-* Coverage analysis: Percentage of queries fully resolved by indexes.
-
 ## 2. Performance Metrics
 
 ### 2.1 Throughput
 * Operations per Second (ops/s): Measure the number of CRUD operations MongoDB can process per second under a specific workload.
 
-### 2.2 Scalability
-* Horizontal Scaling Efficiency: Measure how throughput and latency change as new nodes are added to the cluster.
-* Shard Balancing Time: Time taken to redistribute data across shards after scaling.
-
-### 2.3 Resource Utilization
+### 2.2 Resource Utilization
 * CPU Utilization (%): Measure CPU usage under various workloads.
 * Memory Utilization (%): Track memory usage during read and write-intensive operations.
 * Disk I/O (MB/s): Monitor disk reads/writes during heavy data insertions or queries.
@@ -38,9 +30,6 @@
 ### 3.2 Durability
 * Data Loss on Failure: Measure the extent of data loss (if any) under sudden node or cluster failures.
 
-### 3.3 Error Recovery
-* Recovery Time (s): Time taken to restore a node or cluster to operational status after a failure.
-
 ## 4. Fuzz Testing Metrics
 
 ### 4.1 Resilience
@@ -50,14 +39,7 @@
 * Edge Case Coverage: Number and variety of edge cases detected during fuzz testing.
 * Execution Paths Tested: Percentage of code paths executed during fuzz testing.
 
-## 5. Advanced Query Performance Metrics
+## 5. Benchmark Metrics
 
-### 5.1 Aggregation Pipeline Metrics
-* Pipeline Execution Time (ms): Measure the time to execute complex aggregation queries involving multiple stages.
-* Pipeline Optimization: Track execution time improvements when optimizations are applied (e.g., $merge, $lookup stages).
-
-## 6. Benchmark Metrics
-
-### 6.1 Load Testing
-* Read/Write Ratio Performance: Evaluate throughput and latency under different read/write ratios (e.g., 80:20, 50:50).
-* Sustained Performance: Measure system performance over extended periods (e.g., 1 hour test).
+### 5.1 Load Testing
+* Sustained Performance: Measure system performance over an extended period (e.g., 1 hour test).
