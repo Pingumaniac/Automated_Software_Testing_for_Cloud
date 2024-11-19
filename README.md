@@ -208,6 +208,28 @@ rs.status()
 
 ### Steps for Full Setup
 
+#### Step 0: Pre-requisites
+
+1. **Ensure All VMs Are Accessible**:
+   - **VM1**: `192.168.5.56` (Control and Orchestration Node)
+   - **VM2**: `192.168.5.211` (Primary MongoDB Node)
+   - **VM3**: `192.168.5.68` (Testing and API Server)
+   - **VM4**: `192.168.5.25` (MongoDB Replica Node)
+
+2. **Installed Software**:
+   - **VM1**:
+     - Kubernetes (`kubectl`) installed.
+     - Docker installed.
+   - **VM2 & VM4**:
+     - Docker installed.
+     - MongoDB containers running.
+   - **VM3**:
+     - Python 3.12.6 installed.
+     - All required Python dependencies installed from `requirements.txt`.
+
+3. **Ensure Network Connectivity**:
+   - All VMs must be able to communicate with each other via their public or private IPs.
+
 #### Step 1: Deploy MongoDB in Docker on VM2
 
 **Using Docker Compose**:

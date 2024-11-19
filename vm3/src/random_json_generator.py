@@ -6,7 +6,6 @@ import os
 from yaspin import yaspin
 from pathlib import Path
 
-
 class RandomJSONGenerator:
     def __init__(self, verbose=False):
         self.verbose = verbose
