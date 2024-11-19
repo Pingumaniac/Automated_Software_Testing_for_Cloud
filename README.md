@@ -59,7 +59,6 @@ scalability, and reliability.
 ### VM1: Control and Orchestration Node
 
 - **Tools**:
-  - **OpenStack CLI**: Manages cloud resources on Chameleon Cloud.
   - **Kubernetes CLI** (`kubectl`): Controls Kubernetes deployments across
   VMs.
 
