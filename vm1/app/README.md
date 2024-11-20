@@ -45,9 +45,11 @@
 * Sustained Performance: Measure system performance over an extended period (e.g., 1 hour test).
 
 
-# Code Descriptions
+## Code Descriptions
 
 1. **`test_unit.py`**: Contains unit tests to validate MongoDB’s core functionalities, including CRUD operations and replica set configurations. These tests ensure MongoDB operates as expected in both standalone and replica set modes.
 2. **`test_simple_fuzz.py`**: A simple fuzz testing script that performs CRUD operations using randomly generated data. This script is designed to assess MongoDB’s resilience to unexpected or edge-case inputs by inserting, updating, and deleting randomized documents.
 3. **`test_afl.py`**: Integrates American Fuzzy Lop (AFL) for advanced fuzz testing. This script generates malformed or random inputs to identify vulnerabilities or stability issues in MongoDB, helping ensure robustness under diverse data conditions.
 4. **`test_performance.py`**: A script designed to evaluate MongoDB’s performance. It captures metrics such as response time and throughput.
+5. **`mongo_client.py`**: A MongoDB client manager that handles connection logic and CRUD operations. This file provides a streamlined API for other components to interact with the MongoDB replica set.
+6. **`random_json_generator.py`**: A utility for generating random JSON documents with diverse data types, ideal for testing MongoDB with varying input. It’s particularly useful for stress and fuzz testing scenarios, where data variability is essential.
