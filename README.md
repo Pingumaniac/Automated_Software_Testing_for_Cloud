@@ -57,62 +57,14 @@ clusters. Each VM is designated for specific roles to maximize efficiency,
 scalability, and reliability.
 
 ### VM1: Control and Orchestration Node
+  - Master node in Kubernetes. Deploys all pods.
 
-- **Tools**:
-  - **Kubernetes CLI** (`kubectl`): Controls Kubernetes deployments across
-  VMs.
+### VM3: Primary MongoDB Replica Set
+  - Runs Kubernetes pod that hosts the primary MongoDB replica set.
 
-- **Role**:
-  - Acts as the control point for testing environments, deploying and
-  monitoring MongoDB configurations across Docker and Kubernetes.
-  - Manages testing workflows, including setup and teardown, to ensure
-  each service is deployed correctly and can communicate across VMs.
-
-### VM2: Primary MongoDB Node
-
-- **Tools**:
-  - **Docker**: Hosts MongoDB in a container for isolated deployment.
-  - **Kubernetes**: Operates as a Kubernetes worker node, enabling MongoDB
-  to be managed in a StatefulSet configuration with persistent storage.
-
-- **Role**:
-  - Acts as the primary MongoDB instance or leader in the MongoDB
-  Kubernetes StatefulSet.
-  - Maintains persistent storage managed by Kubernetes for data durability
-  across pod restarts or migrations.
-  - Supports replication and high availability as part of a clustered
-  MongoDB setup, essential for scalability and reliability testing.
-
-### VM3: Testing and API Server
-
-- **Tools**:
-  - **Python**: Runs unit and fuzz testing scripts on MongoDB deployments.
-  - **FastAPI**: Provides an API interface to interact with MongoDB for
-  testing CRUD operations and replica management.
-
-- **Role**:
-  - Hosts unit and fuzz tests targeting both MongoDB
-  instances in vm2 and vm4 to validate functionality, reliability, and performance.
-  - Exposes an API via FastAPI, allowing CRUD operations and MongoDB
-  interactions through standardized endpoints.
-  - Acts as the central interface for testing MongoDB operations across
-  multiple environments, supporting API-driven tests, fuzzing, and load tests.
-
-### VM4: MongoDB Replica Node
-
-- **Tools**:
-  - **Docker**: Runs MongoDB as a containerized replica.
-  - **Kubernetes**: Functions as a worker node in the Kubernetes cluster
-  to provide replication and high availability in coordination with VM2.
-
-- **Role**:
-  - Acts as a replica node in the MongoDB Kubernetes StatefulSet, ensuring
-  data redundancy and high availability.
-  - Synchronizes data with the primary MongoDB instance on VM2, providing
-  a robust environment for testing replica set configurations.
-  - Contributes to the Kubernetes-managed high-availability MongoDB
-  cluster, supporting failover, replication, and resiliency tests.
-
+### VM4: Secondary MongoDB Replica Set + MongoDB Client
+  - Runs Kubernetes pod that hosts the secondary MongoDB replica set.
+  - Runs Kubernetes pod that runs a Python MongoDB client to interact with the MongoDB pods.
 
 This VM distribution maximizes the project’s flexibility by leveraging
 Docker for containerized MongoDB deployments, and Kubernetes for
