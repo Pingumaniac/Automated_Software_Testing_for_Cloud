@@ -4,12 +4,13 @@ from unittest.mock import patch, MagicMock
 from pymongo.errors import ConnectionFailure
 from src.mongo_client import MongoDBClient
 
+
 class TestMongoDBClient(unittest.TestCase):
 
     @patch('pymongo.MongoClient')
     def setUp(self, mock_mongo_client):
         """Setup mock MongoDB client."""
-        self.mongo_client = MongoDBClient()
+        self.mongo_client = MongoDBClient(uri="mongodb://192.168.5.211:27017,192.168.5.25:27017/?replicaSet=rs0")
         self.mock_db = MagicMock()
         self.mock_collection = MagicMock()
 

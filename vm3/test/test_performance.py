@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 
 class MongoDBPerformanceTest:
-    def __init__(self, uri="mongodb://localhost:27017", database_name="performance_db", collection_name="performance_collection"):
+    def __init__(self, uri="mongodb://192.168.5.211:27017,192.168.5.25:27017/?replicaSet=rs0", database_name="performance_db", collection_name="performance_collection"):
         self.uri = uri
         self.database_name = database_name
         self.collection_name = collection_name
@@ -87,7 +87,7 @@ class MongoDBPerformanceTest:
 
 if __name__ == "__main__":
     # Initialize and connect to MongoDB
-    performance_test = MongoDBPerformanceTest(uri="mongodb://localhost:27017", database_name="performance_db")
+    performance_test = MongoDBPerformanceTest(uri="mongodb://192.168.5.211:27017,192.168.5.25:27017/?replicaSet=rs0", database_name="performance_db")
     performance_test.connect()
 
     # Run performance tests with a default of 1000 documents

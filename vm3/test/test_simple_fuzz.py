@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
 class TestSimpleFuzzing:
-    def __init__(self, uri="mongodb://localhost:27017", database_name="testdb", collection_name="fuzzdata"):
+    def __init__(self, uri="mongodb://192.168.5.211:27017,192.168.5.25:27017/?replicaSet=rs0", database_name="testdb", collection_name="fuzzdata"):
         self.uri = uri
         self.database_name = database_name
         self.collection_name = collection_name
