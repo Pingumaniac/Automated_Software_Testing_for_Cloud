@@ -164,9 +164,9 @@ rs.status()
 
 1. **Ensure All VMs Are Accessible**:
    - **VM1**: `192.168.5.56` (Control and Orchestration Node)
-   - **VM2**: `192.168.5.211` (Primary MongoDB Node)
-   - **VM3**: `192.168.5.68` (Testing and API Server)
-   - **VM4**: `192.168.5.25` (MongoDB Replica Node)
+   - **VM2**: `192.168.5.211` (No Role)
+   - **VM3**: `192.168.5.68` (Primary MongoDB Replica Set)
+   - **VM4**: `192.168.5.25` (Secondary MongoDB Replica Set + MongoDB Client)
 
 2. **Installed Software**:
    - **VM1**:
@@ -216,7 +216,6 @@ kubectl exec -it mongo-0 -- mongo --eval "rs.initiate()"
 
 **Testing Kubernetes MongoDB Deployment**:
 
-Use FastAPI on VM4 to interact with MongoDB in the Kubernetes setup.
 Run unit and fuzz tests specifically targeting the Kubernetes-based MongoDB cluster.
 
 #### Step 3: Testing Framework and Verification on VM4
