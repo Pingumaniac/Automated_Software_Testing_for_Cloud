@@ -1,7 +1,7 @@
 # K8s
 
 ### Set Up
-1. Set up K8 with `vm1` as master and `vm2`, `vm3`, `vm4` as workers
+1. Set up K8 with `vm1` as master and `vm3` and `vm4` as workers
 
 Next, run 2-9 on `vm1`.
 
@@ -17,7 +17,7 @@ Next, run 2-9 on `vm1`.
     ```
     kubectl get service
     ```
-5. Create 3 Mongo containers on the 3 worker VMs with Statefulset
+5. Create 2 Mongo containers on the 2 worker VMs with Statefulset
     ```
     kubectl apply -f mongo-statefulset.yaml
     ```
@@ -29,7 +29,7 @@ Next, run 2-9 on `vm1`.
     ```
     kubectl exec -it mongo-0 -- mongo
     ```
-8. Create 3 replica sets
+8. Create 2 replica sets
     ```
     rs.initiate({
         "_id" : "rs0",
@@ -41,17 +41,13 @@ Next, run 2-9 on `vm1`.
             {
                     "_id" : 1,
                     "host" : "mongo-1.mongo.default.svc.cluster.local:27017",
-            },
-            {
-                    "_id" : 2,
-                    "host" : "mongo-2.mongo.default.svc.cluster.local:27017",
             }
         ]
     })
     ```
 9. Ensure replica sets are initialized by running this command in the mongo shell on all VMs
     ```
-    kubectl exec -it mongo-[0|1|2] -- mongo
+    kubectl exec -it mongo-[0|1] -- mongo
 
     rs.status()
     ```

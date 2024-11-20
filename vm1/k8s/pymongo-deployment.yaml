@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python-mongo-client
+spec:
+  containers:
+    - name: python-mongo-client
+      image: <user>/pymongo:latest  # Replace with your image name
+      imagePullPolicy: Always
+      command: ["python", "/app/test.py"]
+  restartPolicy: Never
