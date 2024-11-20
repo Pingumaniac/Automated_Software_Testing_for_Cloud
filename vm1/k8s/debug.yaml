@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-debugger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dns-debugger
+  template:
+    metadata:
+      labels:
+        app: dns-debugger
+    spec:
+      containers:
+      - name: dns-debugger
+        image: busybox
+        command:
+          - "sleep"
+          - "3600"  # Keeps the pod running for a while

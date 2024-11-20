@@ -51,7 +51,7 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 
 ## VM Distribution and Roles
 
-This project utilizes Docker and Kubernetes across a four-VM
+This project utilizes Docker and Kubernetes across a three-VM
 setup to automate the deployment, configuration, and testing of MongoDB
 clusters. Each VM is designated for specific roles to maximize efficiency,
 scalability, and reliability.
@@ -172,12 +172,11 @@ rs.status()
    - **VM1**:
      - Kubernetes (`kubectl`) installed.
      - Docker installed.
-   - **VM2 & VM4**:
+     - Python 3.12.6 installed.
+   - **VM3 & VM4**:
      - Docker installed.
      - MongoDB containers running.
-   - **VM3**:
      - Python 3.12.6 installed.
-     - All required Python dependencies installed from `requirements.txt`.
 
 3. **Ensure Network Connectivity**:
    - All VMs must be able to communicate with each other via their public or private IPs.
