@@ -4,8 +4,17 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install pymongo
-RUN pip install pymongo
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    libffi-dev \
+    libssl-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pymongo pytest matplotlib yaspin python-afl
+RUN pip3 install pymongo pytest matplotlib yaspin python-afl
 
 # Copy the Python script (modify this path as needed)
 COPY test.py /app/
