@@ -1,152 +1,131 @@
 # plot_metrics_aflplusplus.py
 
 import json
-import matplotlib.pyplot as plt
 import os
+import matplotlib.pyplot as plt
 
-# Ensure the 'plots' directory exists
-if not os.path.exists('plots'):
-    os.makedirs('plots')
 
-# Load metrics
-metrics_file = "metrics_aflplusplus.json"
-with open(metrics_file, 'r') as f:
-    metrics = json.load(f)
+class MetricPlotter:
+    """
+    Handles plotting of AFL++ fuzz testing metrics.
+    """
+    def __init__(self, metrics_file, plots_dir):
+        self.metrics_file = metrics_file
+        self.plots_dir = plots_dir
+        self.metrics_data = self.load_metrics()
+        self.ensure_plots_dir()
 
-# Initialize data containers
-insert_latencies = []
-query_latencies = []
-update_latencies = []
-delete_latencies = []
-crash_counts = 0
-throughputs = []
-cpu_utilizations = []
-memory_utilizations = []
-disk_io_read = []
-disk_io_write = []
+    def load_metrics(self):
+        """
+        Loads metrics from the JSON file.
+        """
+        if not os.path.exists(self.metrics_file):
+            raise FileNotFoundError(f"Metrics file {self.metrics_file} does not exist.")
+        with open(self.metrics_file, 'r') as f:
+            return json.load(f)
 
-# Process metrics
-for m in metrics:
-    metric = m.get('metric')
-    value = m.get('value')
-    if metric == "Insert Latency (ms)":
-        insert_latencies.append(value)
-    elif metric == "Query Latency (ms)":
-        query_latencies.append(value)
-    elif metric == "Update Latency (ms)":
-        update_latencies.append(value)
-    elif metric == "Delete Latency (ms)":
-        delete_latencies.append(value)
-    elif metric == "Crash Detected":
-        crash_counts += 1
-    elif metric == "Operations per Second (ops/s)":
-        throughputs.append(value)
-    elif metric == "CPU Utilization (%)":
-        cpu_utilizations.append(value)
-    elif metric == "Memory Utilization (MB)":
-        memory_utilizations.append(value)
-    elif metric == "Disk I/O (MB)":
-        disk_io_read.append(value.get('read_MB', 0))
-        disk_io_write.append(value.get('write_MB', 0))
+    def ensure_plots_dir(self):
+        """
+        Ensures that the plots directory exists.
+        """
+        if not os.path.exists(self.plots_dir):
+            os.makedirs(self.plots_dir)
 
-# Plot Insert Latency
-plt.figure(figsize=(10, 6))
-plt.plot(insert_latencies, label='Insert Latency (ms)', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('Latency (ms)')
-plt.title('Insert Operation Latencies')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/insert_latency_aflplusplus.png')
-plt.close()
+    def plot_cpu_utilization(self):
+        """
+        Plots CPU Utilization over time.
+        Metric Number: 2_2_1
+        """
+        cpu_data = [entry['value'] for entry in self.metrics_data if entry['metric_number'] == "2_2_1"]
+        plt.figure(figsize=(10, 6))
+        plt.plot(cpu_data, label='CPU Utilization (%)', color='red', marker='o')
+        plt.xlabel('Fuzz Instances')
+        plt.ylabel('CPU Utilization (%)')
+        plt.title('2.2.1 CPU Utilization')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(self.plots_dir, 'cpu_utilization_aflplusplus.png'))
+        plt.close()
 
-# Plot Query Latency
-plt.figure(figsize=(10, 6))
-plt.plot(query_latencies, label='Query Latency (ms)', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('Latency (ms)')
-plt.title('Query Operation Latencies')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/query_latency_aflplusplus.png')
-plt.close()
+    def plot_memory_utilization(self):
+        """
+        Plots Memory Utilization over time.
+        Metric Number: 2_2_2
+        """
+        memory_data = [entry['value'] for entry in self.metrics_data if entry['metric_number'] == "2_2_2"]
+        plt.figure(figsize=(10, 6))
+        plt.plot(memory_data, label='Memory Utilization (MB)', color='purple', marker='o')
+        plt.xlabel('Fuzz Instances')
+        plt.ylabel('Memory Utilization (MB)')
+        plt.title('2.2.2 Memory Utilization')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(self.plots_dir, 'memory_utilization_aflplusplus.png'))
+        plt.close()
 
-# Plot Update Latency
-plt.figure(figsize=(10, 6))
-plt.plot(update_latencies, label='Update Latency (ms)', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('Latency (ms)')
-plt.title('Update Operation Latencies')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/update_latency_aflplusplus.png')
-plt.close()
+    def plot_crash_rate(self):
+        """
+        Plots Crash Rate over time.
+        Metric Number: 4_1_1
+        """
+        crash_data = [entry['value'] for entry in self.metrics_data if entry['metric_number'] == "4_1_1"]
+        plt.figure(figsize=(10, 6))
+        plt.plot(crash_data, label='Crash Rate (%)', color='black', marker='o')
+        plt.xlabel('Fuzz Instances')
+        plt.ylabel('Crash Rate (%)')
+        plt.title('4.1.1 Crash Rate')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(self.plots_dir, 'crash_rate_aflplusplus.png'))
+        plt.close()
 
-# Plot Delete Latency
-plt.figure(figsize=(10, 6))
-plt.plot(delete_latencies, label='Delete Latency (ms)', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('Latency (ms)')
-plt.title('Delete Operation Latencies')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/delete_latency_aflplusplus.png')
-plt.close()
+    def plot_edge_case_coverage(self):
+        """
+        Plots Edge Case Coverage over time.
+        Metric Number: 4_2_1
+        """
+        edge_case_data = [entry['value'] for entry in self.metrics_data if entry['metric_number'] == "4_2_1"]
+        plt.figure(figsize=(10, 6))
+        plt.plot(edge_case_data, label='Edge Case Coverage', color='orange', marker='o')
+        plt.xlabel('Fuzz Instances')
+        plt.ylabel('Number of Edge Cases')
+        plt.title('4.2.1 Edge Case Coverage')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(self.plots_dir, 'edge_case_coverage_aflplusplus.png'))
+        plt.close()
 
-# Plot Throughput
-plt.figure(figsize=(10, 6))
-plt.plot(throughputs, label='Operations per Second (ops/s)', color='green', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('Throughput (ops/s)')
-plt.title('Throughput')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/throughput_aflplusplus.png')
-plt.close()
+    def plot_execution_paths(self):
+        """
+        Plots Execution Paths Tested over time.
+        Metric Number: 4_2_2
+        """
+        execution_paths_data = [entry['value'] for entry in self.metrics_data if entry['metric_number'] == "4_2_2"]
+        plt.figure(figsize=(10, 6))
+        plt.plot(execution_paths_data, label='Execution Paths Tested', color='blue', marker='o')
+        plt.xlabel('Fuzz Instances')
+        plt.ylabel('Number of Execution Paths')
+        plt.title('4.2.2 Execution Paths Tested')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(self.plots_dir, 'execution_paths_aflplusplus.png'))
+        plt.close()
 
-# Plot CPU Utilization
-plt.figure(figsize=(10, 6))
-plt.plot(cpu_utilizations, label='CPU Utilization (%)', color='red', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('CPU Utilization (%)')
-plt.title('CPU Utilization')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/cpu_utilization_aflplusplus.png')
-plt.close()
+    def generate_all_plots(self):
+        """
+        Generates all required plots.
+        """
+        self.plot_cpu_utilization()
+        self.plot_memory_utilization()
+        self.plot_crash_rate()
+        self.plot_edge_case_coverage()
+        self.plot_execution_paths()
+        print(f"All plots have been generated and saved in the '{self.plots_dir}' directory.")
 
-# Plot Memory Utilization
-plt.figure(figsize=(10, 6))
-plt.plot(memory_utilizations, label='Memory Utilization (MB)', color='purple', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('Memory Utilization (MB)')
-plt.title('Memory Utilization')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/memory_utilization_aflplusplus.png')
-plt.close()
 
-# Plot Disk I/O
-plt.figure(figsize=(10, 6))
-plt.plot(disk_io_read, label='Disk Read (MB)', color='blue', marker='o')
-plt.plot(disk_io_write, label='Disk Write (MB)', color='orange', marker='o')
-plt.xlabel('Test Instances')
-plt.ylabel('Disk I/O (MB)')
-plt.title('Disk I/O')
-plt.legend()
-plt.grid(True)
-plt.savefig('plots/disk_io_aflplusplus.png')
-plt.close()
+if __name__ == "__main__":
+    METRICS_FILE = "metrics_aflplusplus.json"
+    PLOTS_DIR = "plots"
 
-# Plot Crash Rate
-total_operations = len(insert_latencies) + len(query_latencies) + len(update_latencies) + len(delete_latencies)
-crash_rate = (crash_counts / total_operations) * 100 if total_operations > 0 else 0
-
-plt.figure(figsize=(10, 6))
-plt.bar(['Crash Rate'], [crash_rate], color='red')
-plt.ylabel('Crash Rate (%)')
-plt.title('Crash Rate During Fuzz Testing')
-plt.savefig('plots/crash_rate_aflplusplus.png')
-plt.close()
-
-print("Fuzzing metrics plots generated and saved in the 'plots/' directory as PNG files.")
+    plotter = MetricPlotter(METRICS_FILE, PLOTS_DIR)
+    plotter.generate_all_plots()

@@ -1,28 +1,54 @@
 # test_aflplusplus.py
 
-import afl
 import json
-import sys
-import os
 import logging
-from pymongo import MongoClient
-from datetime import datetime, timezone
-import psutil
+import os
+import subprocess
+import sys
 import time
-import uuid
+from datetime import datetime, timezone
+from threading import Thread
 
-# Configure logging to output JSON
-logger = logging.getLogger("FuzzMetrics")
-logger.setLevel(logging.INFO)
+import psutil
 
-# Ensure the metrics_aflplusplus.json file exists
-metrics_file = "metrics_aflplusplus.json"
-if not os.path.exists(metrics_file):
-    with open(metrics_file, 'w') as f:
-        json.dump([], f)
+# Ensure AFL++ and necessary tools are installed
+# You might need to install python-afl and other dependencies
+# pip install python-afl psutil
 
-# Create a file handler that appends JSON logs
+class MetricLogger:
+    """
+    Handles logging of metrics to a JSON file.
+    """
+    def __init__(self, metrics_file):
+        self.metrics_file = metrics_file
+        # Initialize the metrics file if it doesn't exist
+        if not os.path.exists(self.metrics_file):
+            with open(self.metrics_file, 'w') as f:
+                json.dump([], f)
+        # Set up logging
+        self.logger = logging.getLogger("AFL++Metrics")
+        self.logger.setLevel(logging.INFO)
+        self.handler = JSONFileHandler(self.metrics_file)
+        self.logger.addHandler(self.handler)
+
+    def log_metric(self, metric_number, metric_name, value, details=None):
+        """
+        Logs a single metric entry.
+        """
+        log_entry = {
+            "metric_number": metric_number,
+            "metric_name": metric_name,
+            "value": value,
+            "details": details or {},
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        self.logger.info(json.dumps(log_entry))
+
+
 class JSONFileHandler(logging.Handler):
+    """
+    Custom logging handler to append JSON objects to a file.
+    """
     def __init__(self, filename):
         super().__init__()
         self.filename = filename
@@ -38,138 +64,129 @@ class JSONFileHandler(logging.Handler):
             f.seek(0)
             json.dump(data, f, indent=4)
 
-json_handler = JSONFileHandler(metrics_file)
-json_handler.setFormatter(logging.Formatter('%(message)s'))
-logger.addHandler(json_handler)
 
-# Initialize MongoDB Client
-mongo_uri = 'mongodb://mongo-primary:27017/?replicaSet=rs0'
-client = MongoClient(mongo_uri)
-db = client['social_network']
+class ResourceMonitor(Thread):
+    """
+    Monitors CPU and Memory utilization at regular intervals.
+    """
+    def __init__(self, process, logger, interval=1):
+        super().__init__()
+        self.process = process
+        self.logger = logger
+        self.interval = interval
+        self._stop_event = False
 
-# Get process for resource utilization
-process = psutil.Process(os.getpid())
+    def run(self):
+        while not self._stop_event:
+            cpu = self.process.cpu_percent(interval=None)
+            memory = self.process.memory_info().rss / (1024 * 1024)  # Convert to MB
+            self.logger.log_metric("2_2_1", "CPU Utilization (%)", cpu)
+            self.logger.log_metric("2_2_2", "Memory Utilization (MB)", memory)
+            time.sleep(self.interval)
 
-def log_metric(metric_name, value, details=None):
-    """Logs the metric in JSON format."""
-    log_entry = {
-        "metric": metric_name,
-        "value": value,
-        "details": details or {},
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
-    logger.info(json.dumps(log_entry))
+    def stop(self):
+        self._stop_event = True
 
-@afl.instrument
-def fuzz_insert_account(data):
-    """Fuzz target for inserting into Account collection."""
-    try:
-        account = json.loads(data)
-        account.setdefault("accountID", str(uuid.uuid4()))
-        account.setdefault("isAdmin", False)
-        account.setdefault("created_at", datetime.now(timezone.utc).isoformat())
-        account.setdefault("updated_at", datetime.now(timezone.utc).isoformat())
 
-        start_time = time.time()
-        result = db['Account'].insert_one(account)
-        end_time = time.time()
+class AFLFuzzer:
+    """
+    Manages the AFL++ fuzzing process and metrics collection.
+    """
+    def __init__(self, input_dir, output_dir, target_script, duration, metrics_file):
+        self.input_dir = input_dir
+        self.output_dir = output_dir
+        self.target_script = target_script
+        self.duration = duration
+        self.metrics_file = metrics_file
+        self.logger = MetricLogger(self.metrics_file)
+        self.fuzzer_process = None
+        self.resource_monitor = None
 
-        latency_ms = (end_time - start_time) * 1000
-        log_metric("Insert Latency (ms)", latency_ms, {"collection": "Account", "operation": "insert"})
+    def prepare_seed_inputs(self):
+        """
+        Prepares seed input files for fuzzing.
+        """
+        if not os.path.exists(self.input_dir):
+            os.makedirs(self.input_dir)
+            # Example seed inputs
+            valid_input = {
+                "accountID": "123e4567-e89b-12d3-a456-426614174000",
+                "isAdmin": False,
+                "created_at": "2023-01-01T12:00:00Z",
+                "updated_at": "2023-01-01T12:00:00Z"
+            }
+            malformed_input = {
+                "accountID": 12345,
+                "isAdmin": "yes",
+                "created_at": "invalid_date",
+                "updated_at": "2023-01-01T12:00:00Z"
+            }
+            with open(os.path.join(self.input_dir, "valid_input.json"), 'w') as f:
+                json.dump(valid_input, f)
+            with open(os.path.join(self.input_dir, "malformed_input.json"), 'w') as f:
+                json.dump(malformed_input, f)
 
-    except Exception as e:
-        log_metric("Crash Detected", True, {"operation": "insert_account", "error": str(e)})
-        sys.exit(1)  # AFL++ treats non-zero exit as a crash
+    def start_fuzzing(self):
+        """
+        Starts the AFL++ fuzzing process.
+        """
+        self.prepare_seed_inputs()
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
 
-@afl.instrument
-def fuzz_query_user(data):
-    """Fuzz target for querying User collection."""
-    try:
-        query = json.loads(data)
-        start_time = time.time()
-        result = db['User'].find_one(query)
-        end_time = time.time()
-
-        latency_ms = (end_time - start_time) * 1000
-        log_metric("Query Latency (ms)", latency_ms, {"collection": "User", "operation": "find_one"})
-
-    except Exception as e:
-        log_metric("Crash Detected", True, {"operation": "query_user", "error": str(e)})
-        sys.exit(1)
-
-@afl.instrument
-def fuzz_update_admin(data):
-    """Fuzz target for updating Admin collection."""
-    try:
-        update_data = json.loads(data)
-        if "accountID" not in update_data:
-            # Cannot perform update without accountID
-            return
-
-        filter_query = {"accountID": update_data["accountID"]}
-        update_fields = {k: v for k, v in update_data.items() if k != "accountID"}
-        update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
-
-        start_time = time.time()
-        result = db['Admin'].update_one(filter_query, {"$set": update_fields})
-        end_time = time.time()
-
-        latency_ms = (end_time - start_time) * 1000
-        log_metric("Update Latency (ms)", latency_ms, {"collection": "Admin", "operation": "update"})
-
-    except Exception as e:
-        log_metric("Crash Detected", True, {"operation": "update_admin", "error": str(e)})
-        sys.exit(1)
-
-@afl.instrument
-def fuzz_delete_message(data):
-    """Fuzz target for deleting from Messages collection."""
-    try:
-        delete_query = json.loads(data)
-        start_time = time.time()
-        result = db['Messages'].delete_one(delete_query)
-        end_time = time.time()
-
-        latency_ms = (end_time - start_time) * 1000
-        log_metric("Delete Latency (ms)", latency_ms, {"collection": "Messages", "operation": "delete"})
-
-    except Exception as e:
-        log_metric("Crash Detected", True, {"operation": "delete_message", "error": str(e)})
-        sys.exit(1)
-
-def main():
-    """Main function to start fuzzing."""
-    # Initialize AFL++
-    afl.init()
-
-    while afl.loop():
-        # AFL++ provides input data via stdin
-        data = sys.stdin.buffer.read(1024)  # Read up to 1KB of input
-        if not data:
-            break  # No more input
-
-        # Dispatch to different fuzz targets based on some heuristic
-        # For simplicity, randomly choose a fuzz target
-        import random
-        target = random.choice([
-            fuzz_insert_account,
-            fuzz_query_user,
-            fuzz_update_admin,
-            fuzz_delete_message
+        # Start the fuzzing process
+        self.fuzzer_process = subprocess.Popen([
+            "afl-fuzz",
+            "-i", self.input_dir,
+            "-o", self.output_dir,
+            "--", sys.executable, self.target_script
         ])
-        target(data)
 
-    # After fuzzing, log resource utilization
-    cpu_percent = process.cpu_percent(interval=1)
-    memory_info = process.memory_info()
-    memory_usage_mb = memory_info.rss / (1024 * 1024)
-    disk_io = psutil.disk_io_counters()
-    read_mb = disk_io.read_bytes / (1024 * 1024)
-    write_mb = disk_io.write_bytes / (1024 * 1024)
+        # Start resource monitoring
+        self.resource_monitor = ResourceMonitor(psutil.Process(self.fuzzer_process.pid), self.logger)
+        self.resource_monitor.start()
 
-    log_metric("CPU Utilization (%)", cpu_percent, {"pid": process.pid})
-    log_metric("Memory Utilization (MB)", memory_usage_mb, {"pid": process.pid})
-    log_metric("Disk I/O (MB)", {"read_MB": read_mb, "write_MB": write_mb}, {"pid": process.pid})
+        # Monitor for crashes
+        try:
+            start_time = time.time()
+            while time.time() - start_time < self.duration:
+                time.sleep(5)  # Check every 5 seconds
+                crashes = self.get_crash_count()
+                self.logger.log_metric("4_1_1", "Crash Rate (% of operations)", crashes)
+        except KeyboardInterrupt:
+            print("Fuzzing interrupted by user.")
+        finally:
+            self.stop_fuzzing()
+
+    def get_crash_count(self):
+        """
+        Retrieves the number of crashes from the AFL++ output directory.
+        """
+        crashes_dir = os.path.join(self.output_dir, "crashes")
+        if not os.path.exists(crashes_dir):
+            return 0
+        return len(os.listdir(crashes_dir))
+
+    def stop_fuzzing(self):
+        """
+        Stops the fuzzing process and resource monitoring.
+        """
+        if self.fuzzer_process:
+            self.fuzzer_process.terminate()
+            self.fuzzer_process.wait()
+        if self.resource_monitor:
+            self.resource_monitor.stop()
+            self.resource_monitor.join()
+
 
 if __name__ == "__main__":
-    main()
+    # Configuration
+    INPUT_DIR = "afl_inputs_account"
+    OUTPUT_DIR = "afl_outputs_account"
+    TARGET_SCRIPT = "fuzz_account.py"  # Replace with your fuzz target script
+    DURATION = 60  # Duration in seconds
+    METRICS_FILE = "metrics_aflplusplus.json"
+
+    # Initialize and start the fuzzer
+    fuzzer = AFLFuzzer(INPUT_DIR, OUTPUT_DIR, TARGET_SCRIPT, DURATION, METRICS_FILE)
+    fuzzer.start_fuzzing()
