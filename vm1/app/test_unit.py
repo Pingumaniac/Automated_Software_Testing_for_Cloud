@@ -431,19 +431,7 @@ class TestMongoDB:
             self.log_metric("Data Loss on Failure", True, {"error": str(e)})
             pytest.fail(f"Durability test failed: {e}")
 
-    # 4. Fuzz Testing Metrics
-    # 4.1 Resilience
-
-    def test_4_1_1_crash_rate(self, db_connection, setup_data):
-        """Test Crash Rate during CRUD operations."""
-        # Simulating crashes in unit tests is not straightforward.
-        # Typically, fuzz testing scripts would handle crashes.
-        # Here, we monitor if any exceptions occurred during the tests.
-        # We'll assume that any test failure indicates a crash.
-        # Thus, this test serves as a placeholder.
-        # Implementing actual crash rate tracking requires integration with fuzzing tools.
-        self.log_metric("Crash Rate (%)", 0, {"description": "No crashes detected during unit tests."})
-        assert True  # Placeholder
+    # 4. Fuzz Testing Metrics (here only 4.2.1 is also relevant to unit testing)
 
     # 4.2 Vulnerability Metrics
 
@@ -466,15 +454,6 @@ class TestMongoDB:
         self.log_metric("Edge Case Coverage (%)", coverage_percentage, {"collection": "Account"})
         assert coverage_percentage == 0  # All invalid cases should fail
 
-    def test_4_2_2_execution_paths_tested(self):
-        """Test Execution Paths Covered by Unit Tests."""
-        # This metric is typically handled by coverage tools.
-        # Here, we'll log the coverage percentage.
-        # Run pytest with coverage and parse the coverage report.
-        # This is a placeholder as pytest-cov handles coverage reporting externally.
-        coverage_percentage = 80  # Example value
-        self.log_metric("Execution Paths Tested (%)", coverage_percentage, {"description": "Estimated based on test coverage."})
-        assert coverage_percentage >= 70  # Example threshold
 
     # 5. Benchmark Metrics
     # 5.1 Load Testing
