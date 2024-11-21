@@ -97,7 +97,7 @@
 
 1. Follow [this](app/README.md) to set up everything.
 
-### 7.3 Data Generation
+### 7.2 Data Generation
 
 1. **Generate Sample Data:**
    - Run the data generation script to populate the MongoDB database with `Account`, `User`, `Admin`, and `Messages` documents.
@@ -105,7 +105,7 @@
      python generate_data.py
      ```
 
-### 7.4 Running Unit Tests
+### 7.3 Running Unit Tests
 
 1. **Execute Unit Tests:**
    - Run all unit tests to validate CRUD operations and ensure data integrity across collections.
@@ -118,7 +118,7 @@
      pytest --cov=test_lib --cov-report=term-missing test_unit.py
      ```
 
-### 7.5 Running Fuzz Tests
+### 7.4 Running AFL++ Test
 
 1. **Fuzz Testing for Account Collection:**
    - **Prepare Seed Inputs:**
@@ -141,83 +141,119 @@
 
    - **Run AFL++ Fuzzing:**
      ```
-     afl-fuzz -i afl_inputs_account -o afl_outputs_account -- python fuzz_account.py
+     afl-fuzz -i afl_inputs_account -o afl_outputs_account -- python test_aflplusplus.py
      ```
 
-   - **Alternatively, Use the Automation Script:**
+### 7.5 Running Atheris Test
+
+1. **Prepare Seed Inputs:**
+   - Create a directory for Atheris seed inputs and populate it with valid and malformed JSON examples:
      ```
-     ./run_fuzzing.sh
+     mkdir -p input_dir_atheris
+
+     echo '{
+         "accountID": "123e4567-e89b-12d3-a456-426614174000",
+         "isAdmin": false,
+         "created_at": "2023-01-01T12:00:00Z",
+         "updated_at": "2023-01-01T12:00:00Z"
+     }' > input_dir_atheris/seed_insert.json
+
+     echo '{
+         "accountID": "123e4567-e89b-12d3-a456-426614174000"
+     }' > input_dir_atheris/seed_query.json
+
+     echo '{
+         "accountID": "123e4567-e89b-12d3-a456-426614174000",
+         "role": "Administrator"
+     }' > input_dir_atheris/seed_update.json
+
+     echo '{
+         "_id": "507f1f77bcf86cd799439011"
+     }' > input_dir_atheris/seed_delete.json
      ```
 
-2. **Fuzz Testing for Other Collections:**
-   - Repeat similar steps for `User`, `Admin`, and `Messages` collections by creating respective fuzzing scripts (e.g., `fuzz_user.py`, `fuzz_admin.py`, `fuzz_messages.py`) and seed inputs.
+2. **Run Atheris Fuzzing:**
+   - Execute the Atheris fuzzing script:
+     ```
+     python -m atheris app/test_atheris.py
+     ```
+
+   - Atheris will continuously generate and mutate inputs for the fuzzing target functions until manually stopped. To terminate the process, press `Ctrl + C`.
 
 ### 7.6 Analyzing Results
 
-1. **Review Metrics and Crash Logs:**
-   - Check `metrics.json` for latency and performance metrics.
-   - Check `crashes.json` for any crashes detected during fuzz testing.
+1. **Review Metrics and Logs:**
+   - **Unit Tests:** Inspect `metrics.json` for performance metrics and `crashes.json` for details on any failures.
+   - **AFL++ Fuzz Testing:** Examine `metrics_aflplusplus.json` for metrics related to AFL++ fuzzing and look for crash-inducing inputs in the `afl_outputs_account/crashes/` directory.
+   - **Atheris Fuzz Testing:** Review `metrics_atheris.json` for coverage-guided fuzz testing metrics and crash reports.
 
 2. **Generate Visualizations:**
-   - Run the plotting script to create visual representations of the collected metrics.
-     ```
-     python plot_metrics.py
-     ```
-   - Generated plots will be saved in the `plots/` directory.
+   - Use the appropriate plotting script to generate visual metrics:
+     - **Unit Tests:**
+       ```
+       python plot_metrics_unit.py
+       ```
+     - **AFL++ Fuzz Testing:**
+       ```
+       python plot_metrics_aflplusplus.py
+       ```
+     - **Atheris Fuzz Testing:**
+       ```
+       python plot_metrics_atheris.py
+       ```
+
+   - All generated plots will be saved in the `plots/` directory for further analysis.
 
 3. **Inspect Crash Files:**
-   - Navigate to the `afl_outputs_account/crashes/` directory to review crash-inducing inputs.
+   - For AFL++ crashes, navigate to the crash files in the `afl_outputs_account/crashes/` directory:
      ```
      ls afl_outputs_account/crashes
      ```
    - Reproduce a crash by feeding the input back to the fuzzing script:
      ```
-     python fuzz_account.py < afl_outputs_account/crashes/id_000000
+     python test_aflplusplus.py < afl_outputs_account/crashes/id_000000
      ```
-
-### 7.7 Automating the Testing Process
-
-1. **Run Fuzzing for a Specified Duration:**
-   - Use the `run_fuzzing.sh` script to automate fuzz testing runs.
-     ```
-     ./run_fuzzing.sh
-     ```
-
-2. **Integrate with CI/CD Pipelines:**
-   - Incorporate fuzz testing and unit tests into your Continuous Integration workflows to ensure ongoing code quality and resilience.
 
 ## 8. Code Descriptions
 
 ### Scripts
 
-1. **`test_unit.py`**: Contains unit tests to validate MongoDB’s core functionalities, including CRUD operations and replica set configurations. These tests ensure MongoDB operates as expected in both standalone and replica set modes.
+1. **`database_setup.py`**: Initializes the MongoDB database and sets up the necessary collections (`Account`, `User`, `Admin`, and `Messages`). This script ensures that the MongoDB replica set is correctly configured and populated with the required schema before running any tests or fuzzing operations.
 
-2. **`test_simple_fuzz.py`**: A simple fuzz testing script that performs CRUD operations using randomly generated data. This script is designed to assess MongoDB’s resilience to unexpected or edge-case inputs by inserting, updating, and deleting randomized documents.
+2. **`test_unit.py`**: Contains unit tests to validate MongoDB’s core functionalities, including CRUD operations and replica set configurations. This script measures metrics such as latency, throughput, and resource utilization, logging the results in `metrics.json`.
 
-3. **`test_afl.py`**: Integrates American Fuzzy Lop (AFL) for advanced fuzz testing. This script generates malformed or random inputs to identify vulnerabilities or stability issues in MongoDB, helping ensure robustness under diverse data conditions.
+3. **`plot_metrics_unit.py`**: Generates visualizations from `metrics.json`, which is created during unit testing. This script produces PNG plots for CRUD operation latencies, throughput, CPU utilization, memory utilization, and disk I/O. The plots are saved in the `plots/` directory for analysis and reporting.
 
-4. **`test_performance.py`**: A script designed to evaluate MongoDB’s performance. It captures metrics such as response time and throughput.
+4. **`test_aflplusplus.py`**: Performs advanced fuzz testing of MongoDB CRUD operations using AFL++. It generates malformed or random inputs to uncover vulnerabilities or stability issues, logging metrics in `metrics_aflplusplus.json`.
 
-5. **`mongo_client.py`**: A MongoDB client manager that handles connection logic and CRUD operations. This file provides a streamlined API for other components to interact with the MongoDB replica set.
+5. **`plot_metrics_aflplusplus.py`**: Creates visualizations from `metrics_aflplusplus.json`, which is generated during AFL++ fuzz testing. It produces PNG plots for operation latencies, throughput, CPU and memory usage, disk I/O, and crash rates, providing insights into MongoDB’s robustness under fuzzed inputs.
 
-6. **`random_json_generator.py`**: A utility for generating random JSON documents with diverse data types, ideal for testing MongoDB with varying input. It’s particularly useful for stress and fuzz testing scenarios, where data variability is essential.
+6. **`test_atheris.py`**: Uses Google’s Atheris to conduct coverage-guided fuzz testing of MongoDB CRUD operations. This script generates and mutates inputs to identify edge cases and potential vulnerabilities, logging results in `metrics_atheris.json`.
 
-7. **`generate_data.py`**: Script to generate and insert sample data into MongoDB, including `Account`, `User`, `Admin`, and `Messages` documents.
+7. **`plot_metrics_atheris.py`**: Generates visualizations from `metrics_atheris.json`, created during Atheris fuzz testing. It produces PNG plots for CRUD operation latencies, throughput, resource utilization, and crash rates, saved in the `plots/` directory.
 
-8. **`fuzz_account.py`**: Fuzz testing script tailored to the `Account` collection. It generates and inserts fuzzed `Account` documents to test the resilience and security of the `Account` collection.
+8. **`generate_data.py`**: Populates the MongoDB database with sample data for the `Account`, `User`, `Admin`, and `Messages` collections. This script helps simulate realistic data for testing and fuzzing scenarios.
 
-9. **`run_fuzzing.sh`**: Shell script to automate the fuzzing process for the `Account` collection. It prepares seed inputs, starts AFL++ fuzzing, runs it for a specified duration, and then terminates the fuzzing process.
+### 9. Additional Files and Directories
 
-10. **`plot_metrics.py`**: Generates visualizations from `metrics.json` and `crashes.json` to help analyze performance and crash data.
+- **`requirements.txt`**: Lists all the necessary Python dependencies required to run the scripts and tests. Install them using:
+  ```
+  pip install -r requirements.txt
+  ```
 
-### Additional Files and Directories
+- **`metrics.json`**: Log file generated during unit testing. It contains performance and reliability metrics such as CRUD operation latencies, throughput, and resource utilization.
 
-11. **`requirements.txt`**: Lists all necessary Python packages required to run the scripts and tests.
+- **`metrics_aflplusplus.json`**: Log file created during AFL++ fuzz testing. This file logs metrics such as latencies, throughput, CPU and memory usage, and crash events.
 
-12. **`metrics.json` & `crashes.json`**: Log files that store metrics and crash events, respectively, for later analysis and visualization.
+- **`metrics_atheris.json`**: Log file produced during Atheris fuzz testing. It tracks similar metrics to `metrics_aflplusplus.json`, including operation latencies, throughput, and crash events.
 
-13. **`generated_docs/`**: Directory to store generated JSON documents for optional inspection and verification.
+- **`crashes.json`**: Log file that records details of crash events encountered during unit and fuzz testing. This file provides valuable insights into inputs that caused crashes.
 
-14. **`afl_inputs_account/`**: Directory containing seed input files for fuzzing the `Account` collection.
+- **`generated_docs/`**: Directory containing JSON documents generated for testing purposes. These documents simulate realistic and malformed inputs for CRUD operations.
 
-15. **`afl_outputs_account/`**: Directory where AFL++ stores findings related to the `Account` fuzzing, including crashes and unique test cases.
+- **`afl_inputs_account/`**: Directory containing seed input files for fuzz testing the `Account` collection. Seed inputs are critical for initiating fuzz testing processes in AFL++.
+
+- **`afl_outputs_account/`**: Directory where AFL++ stores outputs such as unique test cases and crash-inducing inputs. This directory is essential for analyzing AFL++ fuzz testing results.
+
+- **`plots/`**: Directory that stores PNG plots generated by the plotting scripts (`plot_metrics_unit.py`, `plot_metrics_aflplusplus.py`, and `plot_metrics_atheris.py`). These visualizations provide a graphical representation of the collected metrics.
+

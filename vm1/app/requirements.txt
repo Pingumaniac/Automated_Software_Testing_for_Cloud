@@ -1,20 +1,8 @@
-# MongoDB Python Driver for interacting with MongoDB
-pymongo==4.9.1
-# Pytest for running unit tests
-pytest==8.3.3
-# MongoMock for mocking MongoDB operations in unit tests
-mongomock==4.2.0.post1
-# Fuzz testing integration
-python-afl==0.7.3
-faker==30.3.0
-# Matplotlib for visualization
-matplotlib==3.9.2
-# dnspython is required when using MongoDB with DNS SRV records (e.g., with MongoDB Atlas)
-dnspython==2.6.1
-# PyYAML is useful for handling configuration files in YAML format (e.g., for Kubernetes manifests)
-PyYAML==6.0.2
-# Kubernetes Python Client (Optional: If you need to interact with Kubernetes clusters programmatically)
-kubernetes==31.0.0
-# others
-yaspin==0.5.0
-coverage==7.6.7
+pymongo
+pytest
+pytest-cov
+psutil
+matplotlib
+yaspin
+atheris
+coverage
