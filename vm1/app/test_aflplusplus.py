@@ -8,6 +8,8 @@ import logging
 from pymongo import MongoClient
 from datetime import datetime, timezone
 import psutil
+import time
+import uuid
 
 # Configure logging to output JSON
 logger = logging.getLogger("FuzzMetrics")
