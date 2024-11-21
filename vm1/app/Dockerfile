@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pymongo pytest matplotlib yaspin python-afl
-RUN pip3 install pymongo pytest matplotlib yaspin python-afl
+# Install pymongo pytest matplotlib yaspin python-afl coverage
+RUN pip3 install pymongo pytest matplotlib yaspin python-afl coverage
 
 # Copy the Python script (modify this path as needed)
 COPY test.py /app/
