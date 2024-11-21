@@ -36,7 +36,6 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 
 ## Features
 * Automated MongoDB Setup: Easily deploy a MongoDB cluster locally or on Chameleon Cloud using Docker or Kubernetes.
-* FastAPI for MongoDB Interaction: A high-performance API built with FastAPI to interact with MongoDB.
 * Unit Testing: Validate core MongoDB operations such as CRUD operations and replica set configurations.
 * Fuzz Testing: Stress-test the MongoDB client or server with random or invalid inputs to identify crashes and vulnerabilities.
 * Kubernetes StatefulSet: Deploy and manage MongoDB clusters on Kubernetes with persistent storage and replica sets.
@@ -241,13 +240,13 @@ Conduct fuzz testing on both the Docker-based MongoDB instance on VM2 and the Ku
 
 ### Monitor and Log
 
-You can monitor logs on Docker, Kubernetes, MongoDB, and FastAPI to ensure
+Generate logs on Docker, Kubernetes, and MongoDB to ensure
 stability and identify any issues during the testing process. Use kubectl
 logs for Kubernetes and docker logs for Docker MongoDB instances.
 
 ### Record Results
 
-You can document performance metrics, any anomalies, and any differences
+Document performance metrics, any anomalies, and any differences
 between the Docker and Kubernetes MongoDB instances during unit and fuzz
 testing.
 

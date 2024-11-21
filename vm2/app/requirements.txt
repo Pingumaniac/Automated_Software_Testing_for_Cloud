@@ -7,12 +7,6 @@ mongomock
 # Fuzz testing integration
 python-afl
 faker
-# FastAPI for building high-performance APIs
-fastapi
-# Uvicorn is an ASGI server for serving FastAPI apps
-uvicorn
-# Pydantic is used by FastAPI for data validation
-pydantic
 # Matplotlib for visualization
 matplotlib
 # dnspython is required when using MongoDB with DNS SRV records (e.g., with MongoDB Atlas)
@@ -21,7 +15,5 @@ dnspython
 PyYAML
 # Kubernetes Python Client (Optional: If you need to interact with Kubernetes clusters programmatically)
 kubernetes
-# OpenStack SDK (Optional: if deploying MongoDB on Chameleon Cloud using OpenStack API)
-openstacksdk
 # Others
 yaspin
