@@ -1,10 +1,6 @@
-# Automated_Software_Testing_for_Cloud
+# Unit and Fuzz Testing in Evaluating MongoDB Reliability
 
-This project automates the deployment, configuration, and evaluation of
-MongoDB clusters using Docker and Kubernetes, with built-in support for
-unit testing and fuzz testing. The goal is to provide a framework for
-testing MongoDB performance, scalability, and reliability in various
-environments, including Chameleon Cloud.
+This project explores the use of unit testing and fuzz testing to enhance the deployment and validation of MongoDB clusters in cloud environments using Docker and Kubernetes. MongoDB's growing popularity for its flexibility and scalability underscores the importance of reliable deployment and operational testing in production settings. To address these challenges, we present an automated framework for MongoDB cluster setup, leveraging Docker and Kubernetes StatefulSets to streamline configuration, provide persistent storage, and manage replicas. The framework integrates unit testing to validate core MongoDB functionalities and employs fuzz testing with AFLplusplus (AFL++) to assess resilience, edge-case handling, and execution path coverage under unpredictable inputs. While experimental results demonstrate automation and the detection of potential vulnerabilities, the scope is limited, necessitating further exploration of complementary testing approaches.
 
 ## About Members
 

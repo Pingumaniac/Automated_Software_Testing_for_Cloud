@@ -16,9 +16,9 @@
 ### 2.1 Throughput
 * **Operations per Second (ops/s)**: Measure the number of CRUD operations MongoDB can process per second under a specific workload.
 
-### 2.2 Resource Utilization
-* **CPU Utilization (%)**: Measure CPU usage under various workloads.
-* **Memory Utilization (%)**: Track memory usage during read and write-intensive operations.
+### 2.2 Resource Utilisation
+* **CPU Utilisation (%)**: Measure CPU usage under various workloads.
+* **Memory Utilisation (%)**: Track memory usage during read and write-intensive operations.
 * **Disk I/O (MB/s)**: Monitor disk reads/writes during heavy data insertions or queries.
 
 ## 3. Reliability Metrics
