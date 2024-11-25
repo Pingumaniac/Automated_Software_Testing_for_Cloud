@@ -6,6 +6,7 @@ spec:
   containers:
     - name: python-mongo-client
       image: pingumaniac/pymongo:main  # Replace with your image name
+      # leesuh/pymongo:latest
       imagePullPolicy: Always
       command: ["python", "/app/test.py"]
   restartPolicy: Never
