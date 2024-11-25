@@ -65,3 +65,23 @@ docker run -it pingumaniac/pymongo:main /bin/bash
 ```
 
 16. You can test in kubernetes interactively
+
+- **Get help:**
+   ```
+   kubectl exec -it --help
+   ```
+
+ - **Access the Pod:**
+   ```
+   kubectl exec -it python-mongo-client -- /bin/bash
+   ```
+
+ - **Run `test.py` inside the pod:**
+   ```
+   python3 test.py
+   ```
+
+ - **Exit the Pod:**
+   ```
+   exit
+   ```

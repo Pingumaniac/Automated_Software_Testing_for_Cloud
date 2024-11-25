@@ -23,4 +23,5 @@ COPY . /app/
 # CMD ["python", "/app/test.py"]
 
 # Command to run the Python script when the container starts
-CMD ["bash", "/app/run_tests.sh"]
+# CMD ["bash", "/app/run_tests.sh"]
+ENTRYPOINT [ "/bin/bash" ]
