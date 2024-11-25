@@ -23,7 +23,7 @@ RUN pip3 install pymongo pytest matplotlib yaspin python-afl coverage atheris
 COPY . /app/
 
 # Make the script executable
-RUN chmod +x /app/run_tests.sh
+# RUN chmod +x /app/run_tests.sh
 
 # Command to run the Python script when the container starts
 # CMD ["python", "/app/test.py"]
