@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: python-mongo-client
-      image: <user>/pymongo:latest  # Replace with your image name
+      image: pingumaniac/pymongo:main  # Replace with your image name
       imagePullPolicy: Always
       command: ["python", "/app/test.py"]
   restartPolicy: Never
