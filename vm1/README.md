@@ -40,7 +40,7 @@ kubectl logs python-mongo-client
 ```
 13. The test connection code provided in `test.py` log should show the following:
 ```
-cc@vm1:~/final_project/k8s$ kubectl logs python-mongo-client 
+cc@vm1:~/final_project/k8s$ kubectl logs python-mongo-client
 Connected to MongoDB!
 Databases: ['admin', 'config', 'local']
 Writing to test_db...
@@ -58,3 +58,10 @@ rs0:PRIMARY> db.test_col.find()
 { "_id" : ObjectId("673e33b64fb7ae1a4d85c6aa"), "name" : "test", "value" : 123 }
 rs0:PRIMARY> exit
 ```
+
+15. Note: You can test your docker container interactively (with -it option).
+```
+docker run -it pingumaniac/pymongo:main /bin/bash
+```
+
+16. You can test in kubernetes interactively

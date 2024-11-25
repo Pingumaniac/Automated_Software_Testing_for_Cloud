@@ -16,14 +16,8 @@ RUN apt-get update && apt-get install -y \
 # Install pymongo pytest matplotlib yaspin python-afl coverage atheris
 RUN pip3 install pymongo pytest matplotlib yaspin python-afl coverage atheris
 
-# Copy the Python script (modify this path as needed)
-# COPY test.py /app/
-
 # Copy all application files into the container
 COPY . /app/
-
-# Make the script executable
-# RUN chmod +x /app/run_tests.sh
 
 # Command to run the Python script when the container starts
 # CMD ["python", "/app/test.py"]
