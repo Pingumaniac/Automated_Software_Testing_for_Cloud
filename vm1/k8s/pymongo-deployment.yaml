@@ -3,10 +3,13 @@ kind: Pod
 metadata:
   name: python-mongo-client
 spec:
+  nodeSelector:
+    kubernetes.io/hostname: vm4
   containers:
     - name: python-mongo-client
       image: pingumaniac/pymongo:main  # Replace with your image name
       # leesuh/pymongo:latest
       imagePullPolicy: Always
-      command: ["python", "/app/test.py"]
+      command: ["python", "/app/vm1/app/test.py"] # not /app/test.py
+      # command: ["bash", "/app/vm1/app/run_tests.sh"]
   restartPolicy: Never
