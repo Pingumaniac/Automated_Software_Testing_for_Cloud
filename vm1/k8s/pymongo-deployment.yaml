@@ -12,4 +12,12 @@ spec:
       imagePullPolicy: Always
       command: ["python", "/app/vm1/app/test.py"] # not /app/test.py
       # command: ["bash", "/app/vm1/app/run_tests.sh"]
-  restartPolicy: Never
+      # Not needed if scripts and dependencies are already in the Docker image.
+      volumeMounts:
+        - name: app-volume
+          mountPath: /app/vm1/app
+  restartPolicy: Never # Always?
+  # Can be omitted unless you plan to use dynamic or shared storage.
+  volumes:
+    - name: app-volume
+      emptyDir: {}
