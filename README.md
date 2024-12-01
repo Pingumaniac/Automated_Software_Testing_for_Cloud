@@ -70,9 +70,8 @@ performance.
 ### IP addresses of each VM
 
 1. **VM1**: `192.168.5.56` (Control and Orchestration Node)
-2. **VM2**: `192.168.5.211` (No Role)
-3. **VM3**: `192.168.5.68` (Primary MongoDB Replica Set)
-4. **VM4**: `192.168.5.25` (Secondary MongoDB Replica Set + MongoDB Client)
+2. **VM3**: `192.168.5.68` (Primary MongoDB Replica Set)
+3. **VM4**: `192.168.5.25` (Secondary MongoDB Replica Set + MongoDB Client)
 
 ## How to build this software
 
