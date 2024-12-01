@@ -67,6 +67,13 @@ high-availability and clustered management. This setup facilitates comprehensive
 across different environments, ensuring reliability, scalability, and
 performance.
 
+### IP addresses of each VM
+
+1. **VM1**: `192.168.5.56` (Control and Orchestration Node)
+2. **VM2**: `192.168.5.211` (No Role)
+3. **VM3**: `192.168.5.68` (Primary MongoDB Replica Set)
+4. **VM4**: `192.168.5.25` (Secondary MongoDB Replica Set + MongoDB Client)
+
 ## How to build this software
 
 ### 1. Clone this repository
@@ -150,101 +157,6 @@ kubectl exec -it mongo-[0|1|2] -- mongo
 
 rs.status()
 ```
-
-## How to Test this Software
-
-### Steps for Full Setup
-
-#### Step 0: Pre-requisites
-
-1. **Ensure All VMs Are Accessible**:
-   - **VM1**: `192.168.5.56` (Control and Orchestration Node)
-   - **VM2**: `192.168.5.211` (No Role)
-   - **VM3**: `192.168.5.68` (Primary MongoDB Replica Set)
-   - **VM4**: `192.168.5.25` (Secondary MongoDB Replica Set + MongoDB Client)
-
-2. **Installed Software**:
-   - **VM1**:
-     - Kubernetes (`kubectl`) installed.
-     - Docker installed.
-     - Python 3.12.6 installed.
-   - **VM3 & VM4**:
-     - Docker installed.
-     - MongoDB containers running.
-     - Python 3.12.6 installed.
-
-3. **Ensure Network Connectivity**:
-   - All VMs must be able to communicate with each other via their public or private IPs.
-
-#### Step 1: Deploy MongoDB in Docker on VM2
-
-**Using Docker Compose**:
-
-Deploy a Docker container with MongoDB on VM2 using the docker-compose.yml file:
-```
-docker-compose up -d
-```
-
-Verify MongoDB is accessible on localhost:27017 within VM2.
-
-**Integration Testing for Docker MongoDB**:
-
-Run initial tests against the Docker MongoDB instance to ensure all configurations and connections are set correctly. Use FastAPI or direct CLI commands from VM4 to interact with the MongoDB instance on VM2.
-
-#### Step 2: Deploy MongoDB in Kubernetes on VM3
-
-**Set Up StatefulSet and Persistent Storage**:
-
-Apply the Kubernetes manifests from the k8s folder on VM3:
-```
-kubectl apply -f k8s/mongo-statefulset.yaml
-kubectl apply -f k8s/mongo-pvc.yaml
-kubectl apply -f k8s/mongo-service.yaml
-```
-
-**Initialize MongoDB Replica Set**:
-
-Log into the first MongoDB pod and initialize the replica set:
-```
-kubectl exec -it mongo-0 -- mongo --eval "rs.initiate()"
-```
-
-**Testing Kubernetes MongoDB Deployment**:
-
-Run unit and fuzz tests specifically targeting the Kubernetes-based MongoDB cluster.
-
-#### Step 3: Testing Framework and Verification on VM4
-
-**Run Unit Tests**:
-
-Test basic MongoDB functionality (e.g., CRUD operations, replica configuration) for both Docker and Kubernetes MongoDB instances:
-```
-python -m unittest discover -s tests/
-```
-
-**Run Fuzz Tests**:
-
-Run fuzz tests to validate MongoDB resilience under random and malformed inputs:
-```
-python3 tests/test_simple_fuzz.py
-python3 tests/test_afl.py
-```
-
-Conduct fuzz testing on both the Docker-based MongoDB instance on VM2 and the Kubernetes-based instance on VM3.
-
-## Final Testing and Documentation
-
-### Monitor and Log
-
-Generate logs on Docker, Kubernetes, and MongoDB to ensure
-stability and identify any issues during the testing process. Use kubectl
-logs for Kubernetes and docker logs for Docker MongoDB instances.
-
-### Record Results
-
-Document performance metrics, any anomalies, and any differences
-between the Docker and Kubernetes MongoDB instances during unit and fuzz
-testing.
 
 ## Bug tracking
 
