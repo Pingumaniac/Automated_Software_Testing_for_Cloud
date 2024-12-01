@@ -30,7 +30,7 @@ class DatabaseManager:
 
     def get_collection(self, collection_name):
         """Retrieves a collection from the database."""
-        if self.db:
+        if self.db is not None:
             return self.db[collection_name]
         else:
             logging.error("Database connection is not established.")
@@ -161,7 +161,7 @@ class RandomDataGenerator:
 def main():
     # MongoDB connection URI (update if different)
     mongo_uri = 'mongodb://mongo.default.svc.cluster.local:27017/?replicaSet=rs0'
-    db_name = 'social_network'
+    db_name = 'test_db'
 
     # Initialize Database Manager
     db_manager = DatabaseManager(mongo_uri, db_name)
