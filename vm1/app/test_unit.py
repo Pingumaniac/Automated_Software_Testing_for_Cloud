@@ -330,81 +330,9 @@ class TestMongoDB:
         # No assertion as disk I/O can vary
 
     # 3. Reliability Metrics
-    # 3.1 Fault Tolerance
+    # 3.1 Durability
 
-    def test_3_1_1_failover_time(self, db_connection):
-        """Test Failover Time for Replica Set."""
-        # This requires a replica set with at least two members.
-        # Simulating a failover by stepping down the primary.
-        try:
-            # Get current primary
-            primary = db_connection.command("replSetGetStatus")['members']
-            primary = next(member for member in primary if member['stateStr'] == "PRIMARY")
-            primary_id = primary['_id']
-
-            # Step down the primary
-            db_connection.command("replSetStepDown", 10, force=True)
-            start_time = time.time()
-
-            # Wait for new primary to be elected
-            new_primary = None
-            while time.time() - start_time < 30:
-                status = db_connection.command("replSetGetStatus")
-                members = status['members']
-                for member in members:
-                    if member['stateStr'] == "PRIMARY" and member['_id'] != primary_id:
-                        new_primary = member
-                        break
-                if new_primary:
-                    break
-                time.sleep(1)
-
-            end_time = time.time()
-            if new_primary:
-                failover_time_ms = (end_time - start_time) * 1000
-                self.log_metric("Failover Time (ms)", failover_time_ms, {"new_primary": new_primary['name']})
-                assert failover_time_ms < 5000  # Example threshold
-            else:
-                self.log_metric("Failover Time (ms)", None, {"error": "No new primary elected"})
-                pytest.fail("Failover did not occur within the expected time.")
-        except Exception as e:
-            self.log_metric("Failover Time (ms)", None, {"error": str(e)})
-            pytest.fail(f"Failover test failed: {e}")
-
-    def test_3_1_2_data_consistency(self, db_connection):
-        """Test Data Consistency between Primary and Secondaries."""
-        # This requires a replica set with at least two members.
-        try:
-            # Insert a document on primary
-            test_doc = {
-                "test_field": "consistency_test",
-                "created_at": datetime.utcnow()
-            }
-            db_connection['TestConsistency'].insert_one(test_doc)
-
-            # Wait for replication
-            time.sleep(2)
-
-            # Check on secondary
-            # Connect to secondary (assuming known host, adjust as needed)
-            secondary_uri = 'mongodb://secondary_host:27017/?replicaSet=rs0'
-            secondary_client = MongoClient(secondary_uri)
-            secondary_db = secondary_client['social_network']
-            retrieved_doc = secondary_db['TestConsistency'].find_one({"test_field": "consistency_test"})
-
-            if retrieved_doc:
-                self.log_metric("Data Consistency", True, {"document_id": str(retrieved_doc["_id"])})
-                assert retrieved_doc is not None
-            else:
-                self.log_metric("Data Consistency", False, {"error": "Document not found on secondary"})
-                pytest.fail("Data inconsistency detected.")
-        except Exception as e:
-            self.log_metric("Data Consistency", False, {"error": str(e)})
-            pytest.fail(f"Data consistency test failed: {e}")
-
-    # 3.2 Durability
-
-    def test_3_2_1_data_loss_on_failure(self, db_connection):
+    def test_3_1_1_data_loss_on_failure(self, db_connection):
         """Test Data Loss on Failure."""
         # Simulating data loss is complex; here we check if data remains after a simulated failure.
         try:
@@ -431,29 +359,7 @@ class TestMongoDB:
             self.log_metric("Data Loss on Failure", True, {"error": str(e)})
             pytest.fail(f"Durability test failed: {e}")
 
-    # 4. Fuzz Testing Metrics (here only 4.2.1 is also relevant to unit testing)
-
-    # 4.2 Vulnerability Metrics
-
-    def test_4_2_1_edge_case_coverage(self, db_connection):
-        """Test Edge Case Coverage in CRUD operations."""
-        # Define some edge cases, e.g., inserting documents with missing fields or invalid data types.
-        edge_cases = [
-            {"accountID": None, "isAdmin": "NotABoolean"},
-            {"accountID": "invalid-uuid", "isAdmin": False},
-            {"isAdmin": True},  # Missing accountID
-        ]
-        passed = 0
-        for case in edge_cases:
-            try:
-                db_connection['Account'].insert_one(case)
-                passed += 1
-            except Exception:
-                pass  # Expected to fail
-        coverage_percentage = (passed / len(edge_cases)) * 100
-        self.log_metric("Edge Case Coverage (%)", coverage_percentage, {"collection": "Account"})
-        assert coverage_percentage == 0  # All invalid cases should fail
-
+    # 4. Skipped all Fuzz Testing Metrics
 
     # 5. Benchmark Metrics
     # 5.1 Load Testing

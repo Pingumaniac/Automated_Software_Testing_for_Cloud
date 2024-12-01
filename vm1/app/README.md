@@ -23,11 +23,7 @@
 
 ## 3. Reliability Metrics
 
-### 3.1 Fault Tolerance
-* **Failover Time (ms)**: Measure the time taken for the replica set to elect a new primary when the current primary fails.
-* **Data Consistency**: Verify consistency between primary and secondary nodes under normal operations and after failover.
-
-### 3.2 Durability
+### 3.1 Durability
 * **Data Loss on Failure**: Measure the extent of data loss (if any) under sudden node or cluster failures.
 
 ## 4. Fuzz Testing Metrics

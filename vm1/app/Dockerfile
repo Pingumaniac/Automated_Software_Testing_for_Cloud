@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pymongo pytest matplotlib yaspin python-afl coverage atheris
-RUN pip3 install pymongo pytest matplotlib yaspin python-afl coverage atheris
+# Install pymongo pytest psutil pytest-cov matplotlib yaspin python-afl coverage atheris
+RUN pip3 install pymongo pytest psutil pytest-cov matplotlib yaspin python-afl coverage atheris
 
 # Copy all application files into the container
 COPY . /app/
