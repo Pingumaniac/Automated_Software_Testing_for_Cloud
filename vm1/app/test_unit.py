@@ -11,16 +11,6 @@ import logging
 import json
 import os
 
-# Configure logging to output JSON
-logger = logging.getLogger("TestMetrics")
-logger.setLevel(logging.INFO)
-
-# Ensure the metrics.json file exists
-metrics_file = "metrics.json"
-if not os.path.exists(metrics_file):
-    with open(metrics_file, 'w') as f:
-        json.dump([], f)
-
 # Create a file handler that appends JSON logs
 class JSONFileHandler(logging.Handler):
     def __init__(self, filename):
@@ -37,10 +27,6 @@ class JSONFileHandler(logging.Handler):
             data.append(json.loads(log_entry))
             f.seek(0)
             json.dump(data, f, indent=4)
-
-json_handler = JSONFileHandler(metrics_file)
-json_handler.setFormatter(logging.Formatter('%(message)s'))
-logger.addHandler(json_handler)
 
 @pytest.fixture(scope="session")
 def db_connection():
@@ -382,3 +368,16 @@ class TestMongoDB:
         self.log_metric("Sustained Performance (ops/s)", ops_per_sec, {"operation": "insert", "collection": "Account"})
         assert ops_per_sec > 50  # Example threshold
 
+# Configure logging to output JSON
+logger = logging.getLogger("TestMetrics")
+logger.setLevel(logging.INFO)
+
+# Ensure the metrics.json file exists
+metrics_file = "metrics.json"
+if not os.path.exists(metrics_file):
+    with open(metrics_file, 'w') as f:
+        json.dump([], f)
+
+json_handler = JSONFileHandler(metrics_file)
+json_handler.setFormatter(logging.Formatter('%(message)s'))
+logger.addHandler(json_handler)
