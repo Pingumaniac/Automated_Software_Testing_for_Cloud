@@ -77,8 +77,8 @@ performance.
 
 ### 1. Clone this repository
 ```
-git clone https://github.com/Pingumaniac/Automated_Software_Testing_for_Cloud.git
-cd Automated_Software_Testing_for_Cloud
+git clone git@github.com:Pingumaniac/Unit_and_Fuzz_Testing_in_Evaluating_MongoDB_Reliability.git
+cd Unit_and_Fuzz_Testing_in_Evaluating_MongoDB_Reliability
 ```
 
 ### 2. Set up Docker
