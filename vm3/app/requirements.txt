@@ -5,7 +5,7 @@ pytest
 # MongoMock for mocking MongoDB operations in unit tests
 mongomock
 # Fuzz testing integration
-python-afl
+atheris
 faker
 # Matplotlib for visualization
 matplotlib

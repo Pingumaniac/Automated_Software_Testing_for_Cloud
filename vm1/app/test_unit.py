@@ -369,19 +369,15 @@ class TestMongoDB:
         assert ops_per_sec > 50  # Example threshold
 
 # Configure logging to output JSON
-def main():
-    logger = logging.getLogger("TestMetrics")
-    logger.setLevel(logging.INFO)
+logger = logging.getLogger("TestMetrics")
+logger.setLevel(logging.INFO)
 
-    # Ensure the metrics.json file exists
-    metrics_file = "metrics_unit.json"
-    if not os.path.exists(metrics_file):
-        with open(metrics_file, 'w') as f:
-            json.dump([], f)
+# Ensure the metrics.json file exists
+metrics_file = "metrics_unit.json"
+if not os.path.exists(metrics_file):
+    with open(metrics_file, 'w') as f:
+        json.dump([], f)
 
-    json_handler = JSONFileHandler(metrics_file)
-    json_handler.setFormatter(logging.Formatter('%(message)s'))
-    logger.addHandler(json_handler)
-
-if __name__ == "__main__":
-    main()
+json_handler = JSONFileHandler(metrics_file)
+json_handler.setFormatter(logging.Formatter('%(message)s'))
+logger.addHandler(json_handler)

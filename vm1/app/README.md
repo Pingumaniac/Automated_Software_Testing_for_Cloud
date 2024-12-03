@@ -182,7 +182,7 @@
 
 4. **`test_atheris.py`**: Performs advanced fuzz testing of MongoDB CRUD operations using Atheris. It generates malformed or random inputs to uncover vulnerabilities or stability issues, logging metrics in `metrics_atheris.json`.
 
-5. **`plot_metrics_atheris.py`**: Creates visualizations from `metrics_atheris.json`, which is generated during AFL++ fuzz testing. It produces PNG plots for operation latencies, throughput, CPU and memory usage, disk I/O, and crash rates, providing insights into MongoDB’s robustness under fuzzed inputs.
+5. **`plot_metrics_atheris.py`**: Creates visualizations from `metrics_atheris.json`, which is generated during Atheris fuzz testing. It produces PNG plots for operation latencies, throughput, CPU and memory usage, disk I/O, and crash rates, providing insights into MongoDB’s robustness under fuzzed inputs.
 
 6. **`generate_data.py`**: Populates the MongoDB database with sample data for the `Account`, `User`, `Admin`, and `Messages` collections. This script helps simulate realistic data for testing and fuzzing scenarios.
 

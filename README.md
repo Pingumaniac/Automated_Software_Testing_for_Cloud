@@ -1,6 +1,6 @@
 # Unit and Fuzz Testing in Evaluating MongoDB Reliability
 
-This project explores the use of unit testing and fuzz testing to enhance the deployment and validation of MongoDB clusters in cloud environments using Docker and Kubernetes. MongoDB's growing popularity for its flexibility and scalability underscores the importance of reliable deployment and operational testing in production settings. To address these challenges, we present an automated framework for MongoDB cluster setup, leveraging Docker and Kubernetes StatefulSets to streamline configuration, provide persistent storage, and manage replicas. The framework integrates unit testing to validate core MongoDB functionalities and employs fuzz testing with AFLplusplus (AFL++) to assess resilience, edge-case handling, and execution path coverage under unpredictable inputs. While experimental results demonstrate automation and the detection of potential vulnerabilities, the scope is limited, necessitating further exploration of complementary testing approaches.
+This project explores the use of unit testing and fuzz testing to enhance the deployment and validation of MongoDB clusters in cloud environments using Docker and Kubernetes. MongoDB's growing popularity for its flexibility and scalability underscores the importance of reliable deployment and operational testing in production settings. To address these challenges, we present an automated framework for MongoDB cluster setup, leveraging Docker and Kubernetes StatefulSets to streamline configuration, provide persistent storage, and manage replicas. The framework integrates unit testing to validate core MongoDB functionalities and employs fuzz testing with Atheris to assess resilience, edge-case handling, and execution path coverage under unpredictable inputs. While experimental results demonstrate automation and the detection of potential vulnerabilities, the scope is limited, necessitating further exploration of complementary testing approaches.
 
 ## About Members
 
@@ -28,7 +28,7 @@ This project explores the use of unit testing and fuzz testing to enhance the de
 This project aims to simplify the deployment and evaluation of MongoDB by:
 * Automating the setup of MongoDB clusters using Docker and Kubernetes.
 * Providing a suite of unit tests to validate basic functionality of MongoDB interactions.
-* Integrating fuzz testing, a type of automated software testing, through American Fuzzy Lop (AFL) to identify potential vulnerabilities.
+* Integrating fuzz testing, a type of automated software testing, to identify potential vulnerabilities.
 
 ## Features
 * Automated MongoDB Setup: Easily deploy a MongoDB cluster locally or on Chameleon Cloud using Docker or Kubernetes.
@@ -42,7 +42,7 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 2. Kubernetes (minikube or kubeadm): For orchestrating MongoDB clusters.
 3. Python 3.12.6: For running benchmark and test scripts.
 4. MongoDB CLI Tools: To interact with MongoDB from the command line.
-5. American Fuzzy Lop (AFL): For fuzz testing.
+5. Atheris: For Coverage-guided fuzz testing in Python.
 
 ## VM Distribution and Roles
 
