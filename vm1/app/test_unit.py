@@ -256,8 +256,8 @@ class TestMongoDB:
 
     def test_1_2_1_replication_lag(self, db_connection):
         """Test Replication Lag for Replica Set."""
-        # This is a placeholder. Actual replication lag testing requires a replica set setup with primary and secondary nodes.
-        # Here, we'll simulate a simple check by ensuring the primary is elected.
+        # More sophisicated actual replication lag testing requires a
+        # replica set setup with primary and secondary nodes.
         try:
             server_status = db_connection.command("serverStatus")
             replication_info = server_status.get("repl", {})

@@ -114,33 +114,7 @@
      pytest --cov=test_lib --cov-report=term-missing test_unit.py
      ```
 
-### 7.4 Running AFL++ Test
-
-1. **Fuzz Testing for Account Collection:**
-   - **Prepare Seed Inputs:**
-     ```
-     mkdir -p afl_inputs_account
-     echo '{
-         "accountID": "123e4567-e89b-12d3-a456-426614174000",
-         "isAdmin": false,
-         "created_at": "2023-01-01T12:00:00",
-         "updated_at": "2023-01-01T12:00:00"
-     }' > afl_inputs_account/account_valid.json
-
-     echo '{
-         "accountID": 12345,
-         "isAdmin": "yes",
-         "created_at": "invalid_date",
-         "updated_at": "2023-01-01T12:00:00"
-     }' > afl_inputs_account/account_malformed.json
-     ```
-
-   - **Run AFL++ Fuzzing:**
-     ```
-     afl-fuzz -i afl_inputs_account -o afl_outputs_account -- python test_aflplusplus.py
-     ```
-
-### 7.5 Running Atheris Test
+### 7.4 Running Atheris Test
 
 1. **Prepare Seed Inputs:**
    - Create a directory for Atheris seed inputs and populate it with valid and malformed JSON examples:
@@ -180,7 +154,6 @@
 
 1. **Review Metrics and Logs:**
    - **Unit Tests:** Inspect `metrics.json` for performance metrics and `crashes.json` for details on any failures.
-   - **AFL++ Fuzz Testing:** Examine `metrics_aflplusplus.json` for metrics related to AFL++ fuzzing and look for crash-inducing inputs in the `afl_outputs_account/crashes/` directory.
    - **Atheris Fuzz Testing:** Review `metrics_atheris.json` for coverage-guided fuzz testing metrics and crash reports.
 
 2. **Generate Visualizations:**
@@ -189,22 +162,13 @@
        ```
        python plot_metrics_unit.py
        ```
-     - **AFL++ Fuzz Testing:**
+     - **Atheris Fuzz Testing:**
        ```
-       python plot_metrics_aflplusplus.py
+       python plot_metrics_atheris.py
        ```
 
    - All generated plots will be saved in the `plots/` directory for further analysis.
 
-3. **Inspect Crash Files:**
-   - For AFL++ crashes, navigate to the crash files in the `afl_outputs_account/crashes/` directory:
-     ```
-     ls afl_outputs_account/crashes
-     ```
-   - Reproduce a crash by feeding the input back to the fuzzing script:
-     ```
-     python test_aflplusplus.py < afl_outputs_account/crashes/id_000000
-     ```
 
 ## 8. Code Descriptions
 
@@ -216,9 +180,9 @@
 
 3. **`plot_metrics_unit.py`**: Generates visualizations from `metrics.json`, which is created during unit testing. This script produces PNG plots for CRUD operation latencies, throughput, CPU utilization, memory utilization, and disk I/O. The plots are saved in the `plots/` directory for analysis and reporting.
 
-4. **`test_aflplusplus.py`**: Performs advanced fuzz testing of MongoDB CRUD operations using AFL++. It generates malformed or random inputs to uncover vulnerabilities or stability issues, logging metrics in `metrics_aflplusplus.json`.
+4. **`test_atheris.py`**: Performs advanced fuzz testing of MongoDB CRUD operations using Atheris. It generates malformed or random inputs to uncover vulnerabilities or stability issues, logging metrics in `metrics_atheris.json`.
 
-5. **`plot_metrics_aflplusplus.py`**: Creates visualizations from `metrics_aflplusplus.json`, which is generated during AFL++ fuzz testing. It produces PNG plots for operation latencies, throughput, CPU and memory usage, disk I/O, and crash rates, providing insights into MongoDB’s robustness under fuzzed inputs.
+5. **`plot_metrics_atheris.py`**: Creates visualizations from `metrics_atheris.json`, which is generated during AFL++ fuzz testing. It produces PNG plots for operation latencies, throughput, CPU and memory usage, disk I/O, and crash rates, providing insights into MongoDB’s robustness under fuzzed inputs.
 
 6. **`generate_data.py`**: Populates the MongoDB database with sample data for the `Account`, `User`, `Admin`, and `Messages` collections. This script helps simulate realistic data for testing and fuzzing scenarios.
 
@@ -229,17 +193,13 @@
   pip install -r requirements.txt
   ```
 
-- **`metrics.json`**: Log file generated during unit testing. It contains performance and reliability metrics such as CRUD operation latencies, throughput, and resource utilization.
+- **`metrics_unit.json`**: Log file generated during unit testing. It contains performance and reliability metrics such as CRUD operation latencies, throughput, and resource utilization.
 
-- **`metrics_aflplusplus.json`**: Log file created during AFL++ fuzz testing. This file logs metrics such as latencies, throughput, CPU and memory usage, and crash events.
+- **`metrics_atheris.json`**: Log file created during Atheris fuzz testing. This file logs metrics such as crash rate, edge case coverage, and execution paths tested.
 
 - **`crashes.json`**: Log file that records details of crash events encountered during unit and fuzz testing. This file provides valuable insights into inputs that caused crashes.
 
-- **`generated_docs/`**: Directory containing JSON documents generated for testing purposes. These documents simulate realistic and malformed inputs for CRUD operations.
+- **`json/`**: Directory containing JSON documents generated for testing purposes. These documents simulate realistic and malformed inputs for CRUD operations.
 
-- **`afl_inputs_account/`**: Directory containing seed input files for fuzz testing the `Account` collection. Seed inputs are critical for initiating fuzz testing processes in AFL++.
-
-- **`afl_outputs_account/`**: Directory where AFL++ stores outputs such as unique test cases and crash-inducing inputs. This directory is essential for analyzing AFL++ fuzz testing results.
-
-- **`plots/`**: Directory that stores PNG plots generated by the plotting scripts (`plot_metrics_unit.py` and `plot_metrics_aflplusplus.py`). These visualizations provide a graphical representation of the collected metrics.
+- **`img/`**: Directory that stores PNG plots generated by the plotting scripts (`plot_metrics_unit.py` and `plot_metrics_atheris.py`). These visualizations provide a graphical representation of the collected metrics.
 
