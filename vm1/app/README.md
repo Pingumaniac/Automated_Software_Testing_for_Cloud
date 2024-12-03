@@ -93,64 +93,20 @@
 
 1. Follow [this](app/README.md) to set up everything.
 
-### 7.2 Data Generation
+### 7.2 Access the Kubernetes Pod
+```
+kubectl exec -it python-mongo-client -- /bin/bash
+```
 
-1. **Generate Sample Data:**
-   - Run the data generation script to populate the MongoDB database with `Account`, `User`, `Admin`, and `Messages` documents.
-     ```
-     python generate_data.py
-     ```
+### 7.3 Run the Python codes inside the pod sequentially
+```
+python3 test.py
+python3 database_setup.py
+pytest --cov=test_lib --cov-report=term-missing test_unit.py
+python3 test_atheris.py
+```
 
-### 7.3 Running Unit Tests
-
-1. **Execute Unit Tests:**
-   - Run all unit tests to validate CRUD operations and ensure data integrity across collections.
-     ```
-     pytest test_unit.py
-     ```
-
-   - **Generate Coverage Report (Optional):**
-     ```
-     pytest --cov=test_lib --cov-report=term-missing test_unit.py
-     ```
-
-### 7.4 Running Atheris Test
-
-1. **Prepare Seed Inputs:**
-   - Create a directory for Atheris seed inputs and populate it with valid and malformed JSON examples:
-     ```
-     mkdir -p input_dir_atheris
-
-     echo '{
-         "accountID": "123e4567-e89b-12d3-a456-426614174000",
-         "isAdmin": false,
-         "created_at": "2023-01-01T12:00:00Z",
-         "updated_at": "2023-01-01T12:00:00Z"
-     }' > input_dir_atheris/seed_insert.json
-
-     echo '{
-         "accountID": "123e4567-e89b-12d3-a456-426614174000"
-     }' > input_dir_atheris/seed_query.json
-
-     echo '{
-         "accountID": "123e4567-e89b-12d3-a456-426614174000",
-         "role": "Administrator"
-     }' > input_dir_atheris/seed_update.json
-
-     echo '{
-         "_id": "507f1f77bcf86cd799439011"
-     }' > input_dir_atheris/seed_delete.json
-     ```
-
-2. **Run Atheris Fuzzing:**
-   - Execute the Atheris fuzzing script:
-     ```
-     python -m atheris app/test_atheris.py
-     ```
-
-   - Atheris will continuously generate and mutate inputs for the fuzzing target functions until manually stopped. To terminate the process, press `Ctrl + C`.
-
-### 7.6 Analyzing Results
+### 7.4 Analyzing Results
 
 1. **Review Metrics and Logs:**
    - **Unit Tests:** Inspect `metrics.json` for performance metrics and `crashes.json` for details on any failures.
@@ -169,6 +125,10 @@
 
    - All generated plots will be saved in the `plots/` directory for further analysis.
 
+### 7.5 Exit the Pod
+```
+exit
+```
 
 ## 8. Code Descriptions
 
