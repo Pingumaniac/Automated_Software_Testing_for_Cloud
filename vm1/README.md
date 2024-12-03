@@ -80,8 +80,8 @@ kubectl exec -it python-mongo-client -- /bin/bash
 ```
 python3 test.py
 python3 database_setup.py
-python3 test_unit.py
-python3 test_atheris.py
+pytest --cov=test_lib --cov-report=term-missing test_unit.py
+python3 test_atheris.py -max_len=1024
 python3 plot_metrics_unit.py
 python3 plot_metrics_atheris.py
 ```
