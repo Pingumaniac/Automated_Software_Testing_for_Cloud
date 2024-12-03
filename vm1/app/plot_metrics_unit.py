@@ -117,7 +117,7 @@ class MetricsPlotter:
 
 def main():
     """Main function to execute the plotting."""
-    metrics_plotter = MetricsPlotter(metrics_file="metrics.json")
+    metrics_plotter = MetricsPlotter(metrics_file="metrics_unit.json")
     metrics_plotter.plot_all()
 
 if __name__ == "__main__":

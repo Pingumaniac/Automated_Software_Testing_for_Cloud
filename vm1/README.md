@@ -14,7 +14,7 @@ docker login -u '<user> -p "<password>" docker.io
 5. Ensure all dependencies are copied in `Dockerfile` (so far just copying `test.py`)
 5. Build Docker image from `/vm1/app/`
 ```
-docker build -t <user>/pymongo .
+docker build -t <user>/pymongo:main .
 ```
 7. Check Docker build is listed
 ```
@@ -22,7 +22,7 @@ docker image ls
 ```
 8. Push image to Docker repository
 ```
- docker push <user>/pymongo
+ docker push <user>/pymongo:main
 ```
 9. Configure the user to your username in line 8 in `k8s/pymongo-deployment.yaml`
 10. Run the pod

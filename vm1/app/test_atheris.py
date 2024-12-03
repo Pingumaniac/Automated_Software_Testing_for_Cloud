@@ -7,12 +7,14 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 import logging
-import random
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger("AtherisFuzzer")
 
+# Global iteration count and max iterations
+iteration_count = 0
+MAX_ITERATIONS = 5000
 
 class MongoFuzzer:
     def __init__(self, uri, db_name):
@@ -24,104 +26,157 @@ class MongoFuzzer:
             "admins": self.db["Admin"],
             "messages": self.db["Messages"],
         }
-        self.account_ids = ["pingu", "pinga", "pingi", "robby"]
+        self.metrics = {
+            "total_operations": 0,
+            "crashes": 0,
+            "edge_cases": set(),
+            "code_paths": set(),
+        }
 
-    def setup_initial_accounts(self):
+    def initialize_data(self):
         """
-        Set up four accounts with fixed accountIDs, and create corresponding User and Admin entries.
+        Populate initial data for accounts, users, and admins.
         """
-        account_data = [
-            {"accountID": "pingu", "isAdmin": False, "name": "Pingu", "role": None},
-            {"accountID": "pinga", "isAdmin": False, "name": "Pinga", "role": None},
-            {"accountID": "pingi", "isAdmin": True, "name": "Pingi", "role": "Moderator"},
-            {"accountID": "robby", "isAdmin": True, "name": "Robby", "role": "SuperAdmin"},
-        ]
+        self.insert_account("pingu", is_admin=False)
+        self.insert_account("pinga", is_admin=False)
+        self.insert_account("pingi", is_admin=True)
+        self.insert_account("robby", is_admin=True)
 
-        for account in account_data:
-            # Insert Account
-            self.collections["accounts"].update_one(
-                {"accountID": account["accountID"]},
-                {
-                    "$setOnInsert": {
-                        "accountID": account["accountID"],
-                        "isAdmin": account["isAdmin"],
-                        "created_at": datetime.utcnow(),
-                        "updated_at": datetime.utcnow(),
-                    }
-                },
-                upsert=True,
-            )
-            # Insert User or Admin
-            if account["isAdmin"]:
-                self.collections["admins"].update_one(
-                    {"accountID": account["accountID"]},
-                    {
-                        "$setOnInsert": {
-                            "accountID": account["accountID"],
-                            "name": account["name"],
-                            "birthday": datetime(1980, 1, 1),
-                            "nationality": "Penguinland",
-                            "gender": "Other",
-                            "ethnicity": "Penguin",
-                            "role": account["role"],
-                            "created_at": datetime.utcnow(),
-                            "updated_at": datetime.utcnow(),
-                        }
-                    },
-                    upsert=True,
-                )
-            else:
-                self.collections["users"].update_one(
-                    {"accountID": account["accountID"]},
-                    {
-                        "$setOnInsert": {
-                            "accountID": account["accountID"],
-                            "name": account["name"],
-                            "birthday": datetime(1990, 1, 1),
-                            "nationality": "Penguinland",
-                            "gender": "Other",
-                            "ethnicity": "Penguin",
-                            "created_at": datetime.utcnow(),
-                            "updated_at": datetime.utcnow(),
-                        }
-                    },
-                    upsert=True,
-                )
+        self.insert_user("pingu", "Pingu", "1990-01-01", "Antarctican", "Male", "Penguin")
+        self.insert_user("pinga", "Pinga", "1995-05-01", "Antarctican", "Female", "Penguin")
+        self.insert_admin(
+            "pingi", "Pingi", "1985-12-01", "Antarctican", "Male", "Penguin", "SuperAdmin"
+        )
+        self.insert_admin(
+            "robby", "Robby", "1980-03-15", "Antarctican", "Male", "Penguin", "Moderator"
+        )
 
     def fuzz_operation(self, data):
-        if self.collections["messages"].count_documents({}) >= 300:
-            return  # Stop fuzzing after 300 messages
-
+        """
+        Process fuzzing input, modify the message content, and track metrics.
+        """
+        global iteration_count
         try:
-            fuzz_data = json.loads(data.decode("utf-8", errors="ignore"))
-            operation = fuzz_data.get("operation", "unknown")
-            if operation == "insert_message":
-                self.insert_message(fuzz_data)
-            else:
-                logger.warning(f"Unrecognized operation: {operation}")
+            if iteration_count >= MAX_ITERATIONS:
+                # Generate metrics and exit
+                logger.info("Reached maximum iterations. Generating final metrics.")
+                self.generate_metrics()
+                sys.exit("Program terminated after reaching 300 iterations.")
+
+            # Decode and process fuzzing input
+            fuzz_content = data.decode("utf-8", errors="ignore")
+
+            # Simulate code path and edge case tracking
+            self.metrics["total_operations"] += 1
+            if fuzz_content.strip() == "":
+                self.metrics["edge_cases"].add("Empty content")
+            elif len(fuzz_content) > 100:
+                self.metrics["edge_cases"].add("Overly long content")
+            elif fuzz_content.startswith("\0"):
+                self.metrics["edge_cases"].add("Null byte start")
+            self.metrics["code_paths"].add("insert_message")
+
+            # Insert message
+            self.insert_message("pingu", "pingi", fuzz_content)
+            iteration_count += 1
+
         except Exception as e:
+            self.metrics["crashes"] += 1
             logger.error(f"Crash detected during fuzzing operation: {e}")
 
-    def insert_message(self, fuzz_data):
-        try:
-            document = {
-                "senderID": fuzz_data.get("senderID", random.choice(self.account_ids[:2])),  # From pingu or pinga
-                "receiverID": fuzz_data.get("receiverID", random.choice(self.account_ids[2:])),  # To pingi or robby
-                "content": fuzz_data.get("content", "Hello, World!"),
-                "sent_time": fuzz_data.get("sent_time", datetime.utcnow()),
-                "read_time": fuzz_data.get("read_time", None),
-                "status": fuzz_data.get("status", random.choice(["Sent", "Delivered", "Read"])),
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow(),
-            }
-            self.collections["messages"].insert_one(document)
-            logger.info(f"Successfully inserted message: {document}")
-        except Exception as e:
-            logger.error(f"Error inserting message: {e}")
+    def insert_account(self, account_id, is_admin=False):
+        """
+        Insert an account into the Account collection.
+        """
+        account = {
+            "accountID": account_id,
+            "isAdmin": is_admin,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
+        self.collections["accounts"].insert_one(account)
+
+    def insert_user(self, account_id, name, birthday, nationality, gender, ethnicity):
+        """
+        Insert a user into the User collection.
+        """
+        user = {
+            "accountID": account_id,
+            "name": name,
+            "birthday": birthday,
+            "nationality": nationality,
+            "gender": gender,
+            "ethnicity": ethnicity,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
+        self.collections["users"].insert_one(user)
+
+    def insert_admin(self, account_id, name, birthday, nationality, gender, ethnicity, role):
+        """
+        Insert an admin into the Admin collection.
+        """
+        admin = {
+            "accountID": account_id,
+            "name": name,
+            "birthday": birthday,
+            "nationality": nationality,
+            "gender": gender,
+            "ethnicity": ethnicity,
+            "role": role,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
+        self.collections["admins"].insert_one(admin)
+
+    def insert_message(self, sender_id, receiver_id, content):
+        """
+        Insert a message into the Messages collection.
+        """
+        message = {
+            "senderID": sender_id,
+            "receiverID": receiver_id,
+            "content": content,
+            "sent_time": datetime.utcnow(),
+            "read_time": None,
+            "status": "Sent",
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
+        self.collections["messages"].insert_one(message)
+        logger.info(f"Successfully inserted message: {message}")
 
     def generate_metrics(self):
-        total_messages = self.collections["messages"].count_documents({})
-        logger.info(f"Total messages inserted: {total_messages}")
+        """
+        Generate metrics and save them to a JSON file.
+        """
+        crash_rate = (
+            (self.metrics["crashes"] / self.metrics["total_operations"]) * 100
+            if self.metrics["total_operations"] > 0
+            else 0
+        )
+        edge_case_coverage = len(self.metrics["edge_cases"])
+        execution_paths_tested = len(self.metrics["code_paths"])
+
+        metrics = {
+            "Crash Rate (%)": crash_rate,
+            "Edge Case Coverage": edge_case_coverage,
+            "Execution Paths Tested": execution_paths_tested,
+            "Total Messages Inserted": self.collections["messages"].count_documents({}),
+            "Unique Content Variations": len(
+                set(
+                    doc["content"]
+                    for doc in self.collections["messages"].find({}, {"content": 1})
+                )
+            ),
+            "Total Operations": self.metrics["total_operations"],
+            "Max Iterations": MAX_ITERATIONS,
+        }
+
+        # Save metrics to JSON file
+        with open("metrics_atheris.json", "w") as f:
+            json.dump(metrics, f, indent=4)
+        logger.info(f"Metrics saved to metrics_atheris.json: {metrics}")
 
 
 def fuzz_target(data):
@@ -133,52 +188,10 @@ if __name__ == "__main__":
     MONGO_URI = "mongodb://mongo.default.svc.cluster.local:27017/?replicaSet=rs0"
     DB_NAME = "test_db"
 
-    # Initialize MongoFuzzer
+    # Initialize MongoFuzzer and seed data
     fuzzer = MongoFuzzer(MONGO_URI, DB_NAME)
+    fuzzer.initialize_data()
 
-    # Setup initial accounts, users, and admins
-    fuzzer.setup_initial_accounts()
-
-    # Prepare Seed Inputs Directory
-    INPUT_DIR = "input_dir_atheris"
-    if not os.path.exists(INPUT_DIR):
-        os.makedirs(INPUT_DIR)
-
-        # Create seed inputs
-        seeds = [
-            {
-                "operation": "insert_message",
-                "senderID": "pingu",
-                "receiverID": "pingi",
-                "content": "Test Message 1",
-                "status": "Sent",
-                "sent_time": str(datetime.utcnow()),
-            },
-            {
-                "operation": "insert_message",
-                "senderID": "pinga",
-                "receiverID": "robby",
-                "content": "Test Message 2",
-                "status": "Delivered",
-                "sent_time": str(datetime.utcnow()),
-            },
-            {
-                "operation": "insert_message",
-                "senderID": "pingu",
-                "receiverID": "robby",
-                "content": "Edge case test",
-                "status": "Read",
-                "sent_time": str(datetime.utcnow()),
-                "read_time": str(datetime.utcnow()),
-            },
-        ]
-        for idx, seed in enumerate(seeds, start=1):
-            with open(f"{INPUT_DIR}/seed_{idx}.json", "w") as f:
-                json.dump(seed, f)
-
-    # Run Atheris
+    # Run Atheris fuzzing
     atheris.Setup(sys.argv, fuzz_target)
     atheris.Fuzz()
-
-    # Generate metrics
-    fuzzer.generate_metrics()
