@@ -103,7 +103,7 @@ kubectl exec -it python-mongo-client -- /bin/bash
 python3 test.py
 python3 database_setup.py
 pytest --cov=test_lib --cov-report=term-missing test_unit.py
-python3 test_atheris.py
+python3 test_atheris.py -max_len=1024
 ```
 
 ### 7.4 Analyzing Results
@@ -112,7 +112,7 @@ python3 test_atheris.py
    - **Unit Tests:** Inspect `metrics.json` for performance metrics and `crashes.json` for details on any failures.
    - **Atheris Fuzz Testing:** Review `metrics_atheris.json` for coverage-guided fuzz testing metrics and crash reports.
 
-2. **Generate Visualizations:**
+2. **Visualise data:**
    - Use the appropriate plotting script to generate visual metrics:
      - **Unit Tests:**
        ```

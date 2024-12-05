@@ -158,26 +158,70 @@ rs.status()
 
 ## How to test this software
 
-Instructions to Execute the Software
+#### a. Login to Docker. To create an account or find your username and password, go here: https://app.docker.com/
+```
+docker login -u '<user> -p "<password>" docker.io
+```
 
-#### a. Prerequisites
+#### b. Navigate to Docker image in `/vm1/app/`
 
-1. Follow [this](app/README.md) to set up everything.
+#### c. Change the client code as needed by modifying `test.py`
 
-#### b. Access the Kubernetes Pod
+#### d. Ensure all dependencies are copied in `Dockerfile` (so far just copying `test.py`)
+
+#### e. Build Docker image from `/vm1/app/`
+```
+docker build -t <user>/pymongo:main .
+```
+
+#### f. Check Docker build is listed
+```
+docker image ls
+```
+
+#### g. Push image to Docker repository
+```
+ docker push <user>/pymongo:main
+```
+
+#### h. Configure the user to your username in line 8 in `k8s/pymongo-deployment.yaml`
+
+#### i. Run the pod
+```
+kubectl apply -f pymongo-deployment.yaml
+```
+
+#### j. Monitor the pod status
+```
+kubectl get pods -w
+```
+
+#### k. The pod should complete after a while. Debug with these two commands:
+```
+kubectl describe po python-mongo-client
+kubectl logs python-mongo-client
+```
+
+#### l. Access the Kubernetes Pod
 ```
 kubectl exec -it python-mongo-client -- /bin/bash
 ```
 
-#### c. Run the Python codes inside the pod sequentially
+#### m. Run the Python codes inside the pod sequentially
 ```
 python3 test.py
 python3 database_setup.py
 pytest --cov=test_lib --cov-report=term-missing test_unit.py
-python3 test_atheris.py
+python3 test_atheris.py -max_len=1024
 ```
 
-#### e. Exit the Pod
+#### n. Visualise data
+```
+python plot_metrics_unit.py
+python plot_metrics_atheris.py
+```
+
+#### n. Exit the Pod
 ```
 exit
 ```
