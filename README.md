@@ -41,8 +41,7 @@ This project aims to simplify the deployment and evaluation of MongoDB by:
 1. Docker: For containerization of MongoDB.
 2. Kubernetes (minikube or kubeadm): For orchestrating MongoDB clusters.
 3. Python 3.12.6: For running benchmark and test scripts.
-4. MongoDB CLI Tools: To interact with MongoDB from the command line.
-5. Atheris: For Coverage-guided fuzz testing in Python.
+4. Atheris: For Coverage-guided fuzz testing in Python.
 
 ## VM Distribution and Roles
 
@@ -93,7 +92,7 @@ To retrieve the MongoDB Docker container, run
 sudo bash install_mongodb.sh
 ```
 
-### 3. Set up Kubernetes
+### 3. Set up Kubernetes StatefulSet
 
 #### a. Set up K8 with `vm1` as master, and `vm3` and `vm4` as workers.
 
@@ -155,6 +154,32 @@ rs.initiate({
 kubectl exec -it mongo-[0|1|2] -- mongo
 
 rs.status()
+```
+
+## How to test this software
+
+Instructions to Execute the Software
+
+#### a. Prerequisites
+
+1. Follow [this](app/README.md) to set up everything.
+
+#### b. Access the Kubernetes Pod
+```
+kubectl exec -it python-mongo-client -- /bin/bash
+```
+
+#### c. Run the Python codes inside the pod sequentially
+```
+python3 test.py
+python3 database_setup.py
+pytest --cov=test_lib --cov-report=term-missing test_unit.py
+python3 test_atheris.py
+```
+
+#### e. Exit the Pod
+```
+exit
 ```
 
 ## Bug tracking
