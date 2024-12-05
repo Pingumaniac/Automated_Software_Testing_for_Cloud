@@ -1,9 +1,9 @@
 # K8s
 
 ### Set Up
-1. Set up K8 with `vm1` as master and `vm3` and `vm4` as workers
+1. Set up K8 with `vm2` as master and `vm3` and `vm4` as workers
 
-Next, run 2-9 on `vm1`.
+Next, run 2-9 on `vm2`.
 
 2. Install Local Path Provisioner
     ```

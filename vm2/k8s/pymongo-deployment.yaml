@@ -10,8 +10,8 @@ spec:
       image: pingumaniac/pymongo:main  # Replace with your image name
       # leesuh/pymongo:latest
       imagePullPolicy: Always
-      # command: ["python", "/app/vm1/app/test.py"] # not /app/test.py
-      # command: ["bash", "/app/vm1/app/run_tests.sh"]
+      # command: ["python", "/app/vm2/app/test.py"] # not /app/test.py
+      # command: ["bash", "/app/vm2/app/run_tests.sh"]
       # command: ["tail", "-f", "/dev/null"]
       command: ["tail"]
       args: ["-f", "/dev/null"]

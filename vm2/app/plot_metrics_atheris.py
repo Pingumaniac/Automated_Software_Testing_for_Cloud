@@ -1,3 +1,5 @@
+# plot_metrics_atheris.py
+
 import json
 import matplotlib.pyplot as plt
 import os
@@ -27,21 +29,20 @@ class AtherisMetricsPlotter:
         """Ensure the output directory for plots exists."""
         os.makedirs(self.output_dir, exist_ok=True)
 
-    def _plot(self, x_values, y_values, labels, title, xlabel, ylabel, filename):
-        """Create a plot and save it as a PNG file."""
+    def _bar_chart(self, labels, values, title, ylabel, filename, yticks=None):
+        """Create a bar chart and save it as a PNG file."""
         plt.figure(figsize=(10, 6))
-        for y, label in zip(y_values, labels):
-            plt.plot(x_values, y, label=label, marker='o')
-        plt.xlabel(xlabel)
+        plt.bar(labels, values, color=["blue", "green"])
         plt.ylabel(ylabel)
         plt.title(title)
-        plt.legend()
-        plt.grid(True)
+        if yticks:
+            plt.yticks(yticks)
+        plt.grid(axis="y")
         plt.savefig(os.path.join(self.output_dir, filename))
         plt.close()
 
     def plot_crash_rate(self):
-        """Plot crash rate metrics."""
+        """Plot crash rate metrics in a separate file."""
         crash_rate = self.metrics.get("Crash Rate (%)", 0)
         plt.figure(figsize=(10, 6))
         plt.bar(["Crash Rate"], [crash_rate], color="red")
@@ -51,40 +52,31 @@ class AtherisMetricsPlotter:
         plt.savefig(os.path.join(self.output_dir, "crash_rate.png"))
         plt.close()
 
-    def plot_edge_case_coverage(self):
-        """Plot edge case coverage metrics."""
-        edge_case_coverage = self.metrics.get("Edge Case Coverage", 0)
-        plt.figure(figsize=(10, 6))
-        plt.bar(["Edge Case Coverage"], [edge_case_coverage], color="blue")
-        plt.ylabel("Number of Edge Cases")
-        plt.title("Edge Case Coverage")
-        plt.grid(axis="y")
-        plt.savefig(os.path.join(self.output_dir, "edge_case_coverage.png"))
-        plt.close()
-
-    def plot_execution_paths_tested(self):
-        """Plot execution paths tested metrics."""
-        execution_paths_tested = self.metrics.get("Execution Paths Tested", 0)
-        plt.figure(figsize=(10, 6))
-        plt.bar(["Execution Paths Tested"], [execution_paths_tested], color="green")
-        plt.ylabel("Number of Execution Paths")
-        plt.title("Execution Paths Tested")
-        plt.grid(axis="y")
-        plt.savefig(os.path.join(self.output_dir, "execution_paths_tested.png"))
-        plt.close()
-
-    def plot_all(self):
-        """Generate all plots."""
-        self.plot_crash_rate()
-        self.plot_edge_case_coverage()
-        self.plot_execution_paths_tested()
-        print(f"Plots generated and saved in the '{self.output_dir}/' directory.")
+    def plot_edge_case_and_execution(self):
+        """Plot edge case coverage and execution paths tested in the same chart."""
+        labels = ["Edge Case Coverage", "Execution Paths Tested"]
+        values = [
+            self.metrics.get("Edge Case Coverage", 0),
+            self.metrics.get("Execution Paths Tested", 0),
+        ]
+        max_value = max(values)
+        yticks = range(0, max_value + 2)  # Incremental y-axis ticks (0, 1, 2, etc.)
+        self._bar_chart(
+            labels=labels,
+            values=values,
+            title="Edge Case Coverage and Execution Paths Tested",
+            ylabel="Values",
+            filename="edge_case_and_execution.png",
+            yticks=yticks,
+        )
+        print(f"Plots saved in '{self.output_dir}/' directory.")
 
 
 def main():
     """Main function to execute the plotting."""
     metrics_plotter = AtherisMetricsPlotter(metrics_file="metrics_atheris.json")
-    metrics_plotter.plot_all()
+    metrics_plotter.plot_crash_rate()
+    metrics_plotter.plot_edge_case_and_execution()
 
 
 if __name__ == "__main__":

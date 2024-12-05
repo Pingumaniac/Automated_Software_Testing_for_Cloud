@@ -159,6 +159,4 @@ exit
 
 - **`crashes.json`**: Log file that records details of crash events encountered during unit and fuzz testing. This file provides valuable insights into inputs that caused crashes.
 
-- **`json/`**: Directory containing JSON documents generated for testing purposes.
-
-- **`img/`**: Directory that stores PNG plots generated.
+- **`plots/`**: Directory that stores PNG plots generated.

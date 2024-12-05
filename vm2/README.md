@@ -8,11 +8,11 @@ Now, we will set up the Docker image that runs the Mongo client code.
 ```
 docker login -u '<user> -p "<password>" docker.io
 ```
-3. Navigate to Docker image in `/vm1/app/`
+3. Navigate to Docker image in `/vm2/app/`
 
 4. Change the client code as needed by modifying `test.py`
 5. Ensure all dependencies are copied in `Dockerfile` (so far just copying `test.py`)
-5. Build Docker image from `/vm1/app/`
+5. Build Docker image from `/vm2/app/`
 ```
 docker build -t <user>/pymongo:main .
 ```
@@ -40,7 +40,7 @@ kubectl logs python-mongo-client
 ```
 13. The test connection code provided in `test.py` log should show the following:
 ```
-cc@vm1:~/final_project/k8s$ kubectl logs python-mongo-client
+cc@vm2:~/final_project/k8s$ kubectl logs python-mongo-client
 Connected to MongoDB!
 Databases: ['admin', 'config', 'local']
 Writing to test_db...

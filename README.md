@@ -50,7 +50,7 @@ setup to automate the deployment, configuration, and testing of MongoDB
 clusters. Each VM is designated for specific roles to maximize efficiency,
 scalability, and reliability.
 
-### VM1: Control and Orchestration Node
+### VM2: Control and Orchestration Node
   - Master node in Kubernetes. Deploys all pods.
 
 ### VM3: Primary MongoDB Replica Set
@@ -68,7 +68,7 @@ performance.
 
 ### IP addresses of each VM
 
-1. **VM1**: `192.168.5.56` (Control and Orchestration Node)
+1. **VM2**: `192.168.5.211` (Control and Orchestration Node)
 2. **VM3**: `192.168.5.68` (Primary MongoDB Replica Set)
 3. **VM4**: `192.168.5.25` (Secondary MongoDB Replica Set + MongoDB Client)
 
@@ -94,9 +94,9 @@ sudo bash install_mongodb.sh
 
 ### 3. Set up Kubernetes StatefulSet
 
-#### a. Set up K8 with `vm1` as master, and `vm3` and `vm4` as workers.
+#### a. Set up K8 with `2` as master, and `vm3` and `vm4` as workers.
 
-Next, run b-i on `vm1`.
+Next, run b-i on `vm2`.
 
 #### b. Install Local Path Provisioner
 ```
@@ -163,13 +163,13 @@ rs.status()
 docker login -u '<user> -p "<password>" docker.io
 ```
 
-#### b. Navigate to Docker image in `/vm1/app/`
+#### b. Navigate to Docker image in `/vm2/app/`
 
 #### c. Change the client code as needed by modifying `test.py`
 
 #### d. Ensure all dependencies are copied in `Dockerfile` (so far just copying `test.py`)
 
-#### e. Build Docker image from `/vm1/app/`
+#### e. Build Docker image from `/vm2/app/`
 ```
 docker build -t <user>/pymongo:main .
 ```
