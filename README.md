@@ -198,7 +198,7 @@ kubectl get pods -w
 
 #### k. The pod should complete after a while. Debug with these two commands:
 ```
-kubectl describe po python-mongo-client
+kubectl describe pod python-mongo-client
 kubectl logs python-mongo-client
 ```
 
@@ -217,8 +217,8 @@ python3 test_atheris.py -max_len=1024
 
 #### n. Visualise data
 ```
-python plot_metrics_unit.py
-python plot_metrics_atheris.py
+python3 plot_metrics_unit.py
+python3 plot_metrics_atheris.py
 ```
 
 #### n. Exit the Pod

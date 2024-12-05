@@ -35,7 +35,7 @@ kubectl get pods -w
 ```
 12. The pod should complete after a while. Debug with these two commands:
 ```
-kubectl describe po python-mongo-client
+kubectl describe pod python-mongo-client
 kubectl logs python-mongo-client
 ```
 13. The test connection code provided in `test.py` log should show the following:

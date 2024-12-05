@@ -2,8 +2,8 @@
     "Crash Rate (%)": 0.0,
     "Edge Case Coverage": 2,
     "Execution Paths Tested": 1,
-    "Total Messages Inserted": 5004,
-    "Unique Content Variations": 1625,
+    "Total Messages Inserted": 20016,
+    "Unique Content Variations": 5289,
     "Total Operations": 5000,
     "Max Iterations": 5000
 }

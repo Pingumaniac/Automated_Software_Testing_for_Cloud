@@ -116,11 +116,11 @@ python3 test_atheris.py -max_len=1024
    - Use the appropriate plotting script to generate visual metrics:
      - **Unit Tests:**
        ```
-       python plot_metrics_unit.py
+       python3 plot_metrics_unit.py
        ```
      - **Atheris Fuzz Testing:**
        ```
-       python plot_metrics_atheris.py
+       python3 plot_metrics_atheris.py
        ```
 
    - All generated plots will be saved in the `plots/` directory for further analysis.

@@ -1,39 +1,39 @@
 [
     {
         "metric": "Insert Latency (ms)",
-        "value": 2.2614002227783203,
+        "value": 1.01470947265625,
         "details": {
             "collection": "Account",
             "operation": "insert"
         },
-        "timestamp": "2024-12-05T20:45:57.950164"
+        "timestamp": "2024-12-05T21:57:43.772426"
     },
     {
         "metric": "Query Latency (ms)",
-        "value": 1.1072158813476562,
+        "value": 1.1661052703857422,
         "details": {
             "collection": "User",
             "operation": "find_one"
         },
-        "timestamp": "2024-12-05T20:45:57.957215"
+        "timestamp": "2024-12-05T21:57:43.777432"
     },
     {
         "metric": "Update Latency (ms)",
-        "value": 2.416849136352539,
+        "value": 1.1372566223144531,
         "details": {
             "collection": "Admin",
             "operation": "update"
         },
-        "timestamp": "2024-12-05T20:45:57.962746"
+        "timestamp": "2024-12-05T21:57:43.781363"
     },
     {
         "metric": "Delete Latency (ms)",
-        "value": 1.268148422241211,
+        "value": 1.0139942169189453,
         "details": {
             "collection": "Messages",
             "operation": "delete"
         },
-        "timestamp": "2024-12-05T20:45:57.969461"
+        "timestamp": "2024-12-05T21:57:43.785273"
     },
     {
         "metric": "Replication Lag (ms)",
@@ -41,32 +41,32 @@
         "details": {
             "replicaSet": "rs0"
         },
-        "timestamp": "2024-12-05T20:45:57.978200"
+        "timestamp": "2024-12-05T21:57:43.792114"
     },
     {
         "metric": "Operations per Second (ops/s)",
-        "value": 767.6027056308747,
+        "value": 914.6186639336219,
         "details": {
             "operation": "insert",
             "collection": "Account"
         },
-        "timestamp": "2024-12-05T20:45:58.112810"
+        "timestamp": "2024-12-05T21:57:43.904715"
     },
     {
         "metric": "CPU Utilization (%)",
         "value": 0.0,
         "details": {
-            "pid": 29
+            "pid": 30
         },
-        "timestamp": "2024-12-05T20:45:59.118141"
+        "timestamp": "2024-12-05T21:57:44.910061"
     },
     {
         "metric": "Memory Utilization (MB)",
-        "value": 41.52734375,
+        "value": 41.84375,
         "details": {
-            "pid": 29
+            "pid": 30
         },
-        "timestamp": "2024-12-05T20:45:59.125892"
+        "timestamp": "2024-12-05T21:57:44.917006"
     },
     {
         "metric": "Disk I/O (MB/s)",
@@ -75,25 +75,25 @@
             "write_MB": 0.0
         },
         "details": {
-            "pid": 29
+            "pid": 30
         },
-        "timestamp": "2024-12-05T20:45:59.131339"
+        "timestamp": "2024-12-05T21:57:44.924247"
     },
     {
         "metric": "Data Loss on Failure",
         "value": false,
         "details": {
-            "document_id": "675211077c997650bc307e9b"
+            "document_id": "675221d83efeef5fe233ec9f"
         },
-        "timestamp": "2024-12-05T20:45:59.160815"
+        "timestamp": "2024-12-05T21:57:44.930673"
     },
     {
         "metric": "Sustained Performance (ops/s)",
-        "value": 751.2984663444831,
+        "value": 847.030921455996,
         "details": {
             "operation": "insert",
             "collection": "Account"
         },
-        "timestamp": "2024-12-05T20:46:00.498242"
+        "timestamp": "2024-12-05T21:57:46.114700"
     }
 ]

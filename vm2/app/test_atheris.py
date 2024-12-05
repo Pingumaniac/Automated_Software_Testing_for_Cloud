@@ -61,7 +61,7 @@ class MongoFuzzer:
                 # Generate metrics and exit
                 logger.info("Reached maximum iterations. Generating final metrics.")
                 self.generate_metrics()
-                sys.exit("Program terminated after reaching 300 iterations.")
+                sys.exit("Program terminated after reaching 5000 iterations.")
 
             # Decode and process fuzzing input
             fuzz_content = data.decode("utf-8", errors="ignore")
