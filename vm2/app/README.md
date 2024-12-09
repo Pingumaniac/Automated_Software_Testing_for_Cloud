@@ -35,11 +35,6 @@
 * **Edge Case Coverage**: Number and variety of edge cases detected during fuzz testing.
 * **Execution Paths Tested**: Percentage of code paths executed during fuzz testing.
 
-## 5. Benchmark Metrics
-
-### 5.1 Load Testing
-* **Sustained Performance**: Measure system performance over an extended period (e.g., 1-hour test).
-
 ## 6. Database Schema
 
 ### 6.1 Account Collection

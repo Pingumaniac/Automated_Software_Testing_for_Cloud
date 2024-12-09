@@ -86,14 +86,5 @@
             "document_id": "675221d83efeef5fe233ec9f"
         },
         "timestamp": "2024-12-05T21:57:44.930673"
-    },
-    {
-        "metric": "Sustained Performance (ops/s)",
-        "value": 847.030921455996,
-        "details": {
-            "operation": "insert",
-            "collection": "Account"
-        },
-        "timestamp": "2024-12-05T21:57:46.114700"
     }
 ]

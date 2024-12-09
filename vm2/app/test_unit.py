@@ -347,27 +347,6 @@ class TestMongoDB:
 
     # 4. Skipped all Fuzz Testing Metrics
 
-    # 5. Benchmark Metrics
-    # 5.1 Load Testing
-
-    def test_5_1_1_sustained_performance(self, db_connection):
-        """Test Sustained Performance over an extended period."""
-        operations = 1000
-        start_time = time.time()
-        for _ in range(operations):
-            account = {
-                "accountID": str(uuid.uuid4()),
-                "isAdmin": False,
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
-            }
-            db_connection['Account'].insert_one(account)
-        end_time = time.time()
-        duration = end_time - start_time
-        ops_per_sec = operations / duration
-        self.log_metric("Sustained Performance (ops/s)", ops_per_sec, {"operation": "insert", "collection": "Account"})
-        assert ops_per_sec > 50  # Example threshold
-
 # Configure logging to output JSON
 logger = logging.getLogger("TestMetrics")
 logger.setLevel(logging.INFO)
